@@ -1,0 +1,191 @@
+{% extends 'layout/plain.twig' %}
+
+{% block head %}
+	<style>
+		html,
+		body {
+
+			background: none;
+			overflow: none;
+		}
+
+		.helper h1 {
+			padding: 0;
+			margin: 0;
+			font-size: 3vw;
+			text-align: center;
+			color: white;
+			font-family: "Arial";
+			font-weight: 700;
+			text-shadow: -1px -1px 2px #000, 1px -1px 2px #000, -1px 1px 2px #000, 1px 1px 2px #000;
+		}
+
+		#titles {
+			position: fixed;
+			height: 20vh;
+			bottom: 5%;
+			width: 100vw;
+			margin: 0 !important;
+		}
+
+		#titles h1 {
+			color: white;
+			font-family: "Arial";
+			font-weight: 700;
+			text-shadow: -1px -1px 1px #000, 1px -1px 1px #000, -1px 1px 1px #000, 1px 1px 1px #000 !important;
+		}
+
+		.title1,
+		.title2 {	
+			margin-bottom: 0;	
+			font-size: 4vh;
+			line-height: 4vh;
+		}
+
+		#titles .sub {
+			margin-top: 0;
+			color: white;
+			font-family: "Arial";
+			font-weight: 700;
+			font-size: 3vh;
+		}
+
+		.helper {
+			position: absolute;
+			bottom: 10%;
+			text-align: center;
+			width: 100%;
+		}
+
+		#titles .sub.header {
+			
+			/* border-top: 2px solid black; */
+		}
+
+		.fix {
+			animation-duration: 2s;
+		}
+
+		#titleAnim,
+		#titleAnim2 {
+			display: none;
+			width: 100vw;
+			background: url("/images/box.png") no-repeat;
+			background-size: contain;
+			background-position: center center;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+	<div>
+		<div id="titles" class="ui grid animated">
+			<div id="titleAnim" style="display: none;" class="ui middle aligned row">
+				<div class="ui sixteen center aligned wide column">
+					<h1 class="ui middle aligned header">
+						<div class="ui content" style="vertical-align: middle">
+							<div class="title1"></div>
+							<div class="ui sub sub1 header"></div>
+						</div>
+					</h1>
+				</div>
+			</div>
+
+			<div id="titleAnim2" style="display: none;" class="ui middle aligned row">
+				<div class="ui eight wide left floated right aligned column">
+					<h1 class="ui middle aligned header">
+						<div class="ui content" style="vertical-align: middle">
+							<div class="title1"></div>
+							<div class="ui sub sub1 header"></div>
+						</div>
+					</h1>
+				</div>
+				<div class="ui eight wide right floated left aligned column">
+					<h1 class="ui middle aligned header">
+						<div class="ui content" style="vertical-align: middle">
+							<div class="title2"></div>
+							<div class="ui sub sub2 header"></div>
+						</div>
+					</h1>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="helper">
+		<h1 id="text0"></h1>
+	</div>
+
+	<div class="helper">
+		<h1 id="text1"></h1>
+	</div>
+
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+		var socket = io.connect();
+var serverOptions = {};
+var oldTitleStatus = false;
+var index = 0;
+
+socket.on("update", data => {
+oldTitleStatus = serverOptions.showTitle;
+serverOptions = data;
+$("#text" + (
+index % 2
+)).fadeOut();
+index++;
+renderView();
+});
+
+function renderView() {
+if (serverOptions.showTitle === true && serverOptions.titles.title1) {
+$("#text").html("");
+showTitles();
+return;
+} else {
+hideTitles();
+}
+
+if (serverOptions.showTitle === false && oldTitleStatus === true) {
+setTimeout(() => {
+$("#text" + (
+index % 2
+)).html(serverOptions.currentText).fadeIn();
+}, 1250);
+} else {
+setTimeout(() => {
+$("#text" + (
+index % 2
+)).html(serverOptions.currentText).fadeIn();
+}, 300);
+}
+}
+	</script>
+	<script>
+		const animIn = "flipInX";
+const animOut = "flipOutX";
+
+function showTitles() {
+
+$('.title1').text(serverOptions.titles.title1);
+$('.sub1').text(serverOptions.titles.sub1);
+$('.title2').text(serverOptions.titles.title2);
+$('.sub2').text(serverOptions.titles.sub2);
+
+if (serverOptions.titles.title2) {
+$("#titleAnim").css("display", "none");
+$("#titleAnim2").css("display", "flex");
+} else {
+$("#titleAnim").css("display", "flex");
+$("#titleAnim2").css("display", "none");
+}
+
+$('#titles').removeClass(animOut).addClass(animIn);
+}
+
+function hideTitles() {
+$('#titles').addClass(animOut).removeClass(animIn);
+}
+	</script>
+{% endblock %}

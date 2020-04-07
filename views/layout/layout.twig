@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>LoistoTxt</title>		
+		<link rel='stylesheet' href='/semantic/semantic.min.css'/>
+    <link rel='stylesheet' href='/stylesheets/styles.css'/>
+    <script src="/javascripts/jquery.min.js"></script>
+		<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+	</head>
+	<body style="height: 100%;">
+	  <div class="ui fluid container">
+      {% block body %}{% endblock %}		
+    </div>
+    
+    <script src="/semantic/semantic.min.js"></script>
+			{% block scripts %}{% endblock %}      
+		</body>
+	</html>

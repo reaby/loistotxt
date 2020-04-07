@@ -1,0 +1,41 @@
+{% extends 'layout/layout.twig' %}
+
+{% block body %}
+	<div class="ui primary top attached pointing menu" style="height: 40px !important;">
+		<input id="filename" class="header item" type="text" value="{{ song }}" placeholder="Filename"/>
+		<div class="item">
+			<button class="ui small action button" onclick="redo();">
+				<i class="ui icon undo"></i>
+				Undo
+			</button>
+		</div>
+		<div class="right menu">
+			<div class="ui buttons">
+				<button class="ui green icon button" onclick="save()">
+					<i class="ui icon save"></i>
+					Save</button>
+				<button class="ui icon button" onclick="window.close();">
+					<i class="ui icon cancel"></i>
+					Cancel</button>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="ui inverted segment">
+		<h1>Edit a Song
+
+		</h1>
+
+		<div class="">
+			<div id="songeditor"></div>
+		</div>
+		<div class="ui center aligned basic segment">
+			<button class="ui icon button" onclick="addVerse()">
+				<i class="ui icon add"></i>Add Part</button>
+		</div>
+
+	</div>
+
+	<script src="/javascripts/editor.js"></script>
+{% endblock %}

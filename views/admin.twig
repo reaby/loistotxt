@@ -1,0 +1,149 @@
+{% extends 'layout/layout.twig' %}
+
+{% block body %}
+	<!-- top menu -->
+	<div class="ui primary top attached pointing menu">
+		<a class="header item" href="/admin">LoistoTxt</a>
+
+		<div id="file" class="ui dropdown item">
+			<div class="text">Show</div>
+			<i class="dropdown icon"></i>
+			<div class="menu">
+				<div class="item" data-value="new">New</div>
+				<div class="item" data-value="open">
+					Open...
+				</div>
+				<div class="item" data-value="save">
+					Save...
+				</div>
+			</div>
+		</div>
+
+		<a class="browse item">
+			Titles
+			<i class="dropdown icon"></i>
+		</a>
+		<div class="ui popup">
+			<div style="width: 60vw;" class="ui three column divided grid">
+				<div class="column">
+					<h4 class="ui header">Left</h4>
+					<div class="ui form list">
+						<input id="title1" class="ui input item" type="text"/>
+						<input id="sub1" class="ui input item" type="text"/>
+					</div>
+				</div>
+				<div class="column">
+					<h4 class="ui header">Right</h4>
+					<div class="ui form list">
+						<input id="title2" class="ui input item" type="text"/>
+						<input id="sub2" class="ui input item" type="text"/>
+					</div>
+				</div>
+				<div class="column">
+					<h4 class="ui header">Actions</h4>
+					<div class="ui list">
+						<div id="toggleTitlesButton" class="ui inverted green button" onclick="toggleTitles();">Show Title</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<div class="right menu">
+			<div class="item">
+				<div class="ui inverted buttons">
+					<button class="ui icon button" onclick="prevText();">
+						<i class="step backward icon"></i>
+					</button>
+
+					<button class="ui  icon button" onclick="nextText();">
+						<i class="step forward icon"></i>
+					</button>
+				</div>
+				<div style="width: 1rem;"></div>
+
+				<div class="ui buttons">
+					<button id="blackout" class="ui black basic button" onclick="clearText();">
+						Clear
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Grids -->
+
+	<!-- <div class="ui three column grid" id="content" > -->
+	<div class="ui two column grid" id="content">
+		<div class="ui eight wide column">
+			<div class="row">
+				<div class="ui inverted basic segment" style="overflow-y: none">
+					<div id="preview" data-url="/preview" class="ui 16:9 embed" style="background: gray; border: 1px solid black;"></div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div id="col1" class="ui inverted basic segment" style="overflow-y: auto">
+					<h1 class="ui inverted header">Songs</h1>
+					<button class="ui basic inverted button" onclick="createNewSong();">Add New</button>
+					<div id="allSongs" class="ui slides list"></div>
+				</div>
+
+			</div>
+		</div>
+
+		<div class="ui five wide column" style="display: none;">
+			<div id="col2" class="ui inverted basic segment" style="overflow-y: auto">
+				<h1 class="ui inverted header">Show</h1>
+				<div id="show" class="ui slides list"></div>
+
+			</div>
+		</div>
+
+		<div class="center aligned eight wide column">
+			<div id="col3" class="ui inverted basic segment" style="overflow-y: auto">
+				<h1 class="ui inverted header">Lyrics</h1>
+				<div id="song" class="ui list"></div>
+				<br><br><br><br>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- menu -->
+<div
+	class="ui primary bottom fixed pointing menu">
+	<!-- 
+														<div class="item" style="width: fit-content;">
+															<div class="ui text">Teksti ruudulle</div>
+															<form class="ui fluid action input" onsubmit="return update(event);">
+																<input style="width: 400px !important;" id="text" type="text" value="">
+																<button type="submit" class="ui small basic green button">Go</button>
+															</form>
+														</div> -->
+	<div class="right menu">
+		<div class="item">
+
+			<div class="ui inverted buttons">
+				<button class="ui icon button" onclick="prevText();">
+					<i class="step backward icon"></i>
+				</button>
+
+				<button class="ui  icon button" onclick="nextText();">
+					<i class="step forward icon"></i>
+				</button>
+			</div>
+
+		</div>
+		<div class="item">
+			<div style="width: 1rem;"></div>
+
+			<button id="blackout" class="ui black basic button" onclick="clearText();">
+				Clear
+			</button>
+
+		</div>
+	</div>
+	<!-- menu -->
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="/javascripts/admin.js"></script>
+{% endblock %}
