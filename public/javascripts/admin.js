@@ -91,7 +91,6 @@ function updateSongs(data) {
             </div>
         </div>`;
     }
-    console.log('updateSongs');
     
     $('#allSongs').html(output);
 }
