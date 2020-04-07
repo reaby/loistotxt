@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 var fs = require('fs');
 
-/* GET home page. */
 router.get('/', function (req, res, next) {
   res.render('display', { title: '' });
 });
@@ -33,7 +32,7 @@ router.get('/ajax/song/:uuid', function (req, res, next) {
   res.json(songData);
 });
 
-router.post('/ajax/song', function (req, res, next) {  
+router.post('/ajax/song', function (req, res, next) {
   let file = './data/songs/' + req.body.filename + ".json";
   fs.writeFileSync(file, req.body.data || "[]");
 
