@@ -1,6 +1,7 @@
 $(() => {
     $.getJSON("/ajax/song/" + "{{ song }}", function (songData) {
         let output = "";
+        if (!Array.isArray(songData)) return;
         for (var data of songData) {
             output += `<div class="ui segment verse">
                     <div class="ui fluid labelled action input">                  
@@ -67,7 +68,7 @@ function addText(elem) {
                     </div>`);
 }
 
-function save() {
+async function save() {
 
     let outData = [];
     $("#songeditor .verse").each(function () {
@@ -94,7 +95,8 @@ function save() {
         $.post("/ajax/song/", {
             "filename": filename,
             "data": JSON.stringify(outData)
-        }, function (data) {
+        }, async function (data) {
+            await socket.emit("getData", {});
             window.close();
         }, "text");
 

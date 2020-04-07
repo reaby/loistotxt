@@ -43,7 +43,7 @@ class websocket {
                 })
 
                 client.on("getData", () => {
-                    client.emit("callback.dataUpdate", self.getIndexFile());
+                    io.emit("callback.dataUpdate", self.getIndexFile());
                 })
 
                 client.on("loadSong", songid => {
@@ -57,8 +57,7 @@ class websocket {
                         }
                     }
                 })
-
-            })
+            });
     }
 
     getIndexFile() {

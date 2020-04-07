@@ -13,7 +13,7 @@ $(function () {
     });
 
 
-    $('#file').dropdown({
+  /*  $('#file').dropdown({
         direction: "downward",
         action: function (text, value) {
             switch (value) {
@@ -29,7 +29,7 @@ $(function () {
             }
         }
     });
-
+*/
     $(window).resize(function () {
         if (this.resizeTO)
             clearTimeout(this.resizeTO);
@@ -67,7 +67,7 @@ socket.on("update", data => {
 
 socket.on("callback.dataUpdate", data => {
     indexData = data;
-    updateSongs();
+    updateSongs(data);
 });
 
 socket.on("callback.loadSong", data => {
@@ -77,9 +77,9 @@ socket.on("callback.loadSong", data => {
 });
 
 
-function updateSongs() {
+function updateSongs(data) {
     let output = "";
-    for (var song of indexData.songs) {
+    for (var song of data.songs) {
         output += `
         <div class="ui green message item">
             <div class="right floated content">
@@ -91,7 +91,8 @@ function updateSongs() {
             </div>
         </div>`;
     }
-
+    console.log('updateSongs');
+    
     $('#allSongs').html(output);
 }
 
