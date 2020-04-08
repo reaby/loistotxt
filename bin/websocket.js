@@ -57,7 +57,11 @@ class websocket {
                 })
 
                 client.on("obs.setScene", async (scene) => {
+                    try {
                     let data = await obs.send("SetCurrentScene", { 'scene-name': scene });
+                    } catch (e) {
+                       io.emit("obs.update", self.serverOptions);
+                    }
                 });
 
                 client.on("getData", () => {

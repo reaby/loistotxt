@@ -79,8 +79,8 @@ socket.on("callback.loadSong", data => {
 socket.on('obs.scenelist', data => {
     let output = "";
     obsScenes = data.scenes;
-
     serverOptions.obs.currentScene = data.currentScene;
+    
     let idx = 0;
     for (var scene of data.scenes) {
         let action = "";
@@ -101,12 +101,9 @@ socket.on('obs.scenelist', data => {
 });
 
 socket.on('obs.update', data => {
-    serverOptions = data;
-    console.log(data);
+    serverOptions = data;    
     renderUI();
 });
-
-
 
 
 function updateSongs(data) {
