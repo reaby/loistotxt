@@ -13,23 +13,23 @@ $(function () {
     });
 
 
-  /*  $('#file').dropdown({
-        direction: "downward",
-        action: function (text, value) {
-            switch (value) {
-                case "new":
-
-                    break;
-                case "open":
-                    console.log("open");
-                    break;
-                case "save":
-                    console.log("save");
-                    break;
-            }
-        }
-    });
-*/
+    /*  $('#file').dropdown({
+          direction: "downward",
+          action: function (text, value) {
+              switch (value) {
+                  case "new":
+  
+                      break;
+                  case "open":
+                      console.log("open");
+                      break;
+                  case "save":
+                      console.log("save");
+                      break;
+              }
+          }
+      });
+  */
     $(window).resize(function () {
         if (this.resizeTO)
             clearTimeout(this.resizeTO);
@@ -58,7 +58,7 @@ var songName = "";
 var songData = {};
 var texts = [];
 var currentIdx = -1;
-
+var obsScenes = [];
 
 socket.on("update", data => {
     serverOptions = data;
@@ -76,6 +76,38 @@ socket.on("callback.loadSong", data => {
     updateSong();
 });
 
+socket.on('obs.scenelist', data => {
+    let output = "";
+    obsScenes = data.scenes;
+
+    serverOptions.obs.currentScene = data.currentScene;
+    let idx = 0;
+    for (var scene of data.scenes) {
+        let action = "";
+        let color = "disabled black";
+        if (scene.enabled) {
+            action = `ondblClick="setScene('${scene.name}', this)"`;
+            color = "green";
+        }
+
+        output += `
+        <button id="scene_${idx}" class="mini ui button ${color}" ${action} style="margin: 0 3px;">${scene.name}</button>
+    `;
+        idx++;
+    }
+    $("#sceneList").html(output);
+
+    renderUI();
+});
+
+socket.on('obs.update', data => {
+    serverOptions = data;
+    console.log(data);
+    renderUI();
+});
+
+
+
 
 function updateSongs(data) {
     let output = "";
@@ -91,8 +123,13 @@ function updateSongs(data) {
             </div>
         </div>`;
     }
-    
+
     $('#allSongs').html(output);
+}
+
+function setScene(name, elem) {
+    $(elem).addClass("loading");
+    socket.emit("obs.setScene", name);
 }
 
 function updateSong() {
@@ -190,6 +227,18 @@ function renderUI() {
     } else {
         $('#toggleTitlesButton').addClass("inverted");
     }
+    var idx = 0;
+    $("#sceneList button").each(function (idx, elem) {
+
+        $(elem).addClass("inverted").removeClass("loading");
+        if (obsScenes[idx].name == serverOptions.obs.currentScene) {
+            console.log(obsScenes[idx].name);
+
+            $(elem).removeClass("inverted");
+        }
+        idx++;
+    });
+
 }
 
 function toggleTitles() {

@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 var ip = require('ip');
-const app = require('../app');
+const { app, obs } = require('../app');
 const debug = require('debug')('loistotxt:server');
 const http = require('http');
 const websocket = require('./websocket.js');
@@ -22,7 +22,8 @@ app.set('port', port);
 
 const server = http.createServer(app);
 const io = require('socket.io')(server);
-const websocket_handler = new websocket(io);
+
+const websocket_handler = new websocket(io, obs);
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -92,7 +93,7 @@ function onListening() {
     ? 'pipe ' + addr
     : 'port ' + addr.port;
 
-  console.log('\nAdmin interface now available:\nhttp://' + ip.address() + ":" + addr.port + "/admin\n");  
-  console.log('OBS add new "browser source" and use this address:\nhttp://' + ip.address() + ":" + addr.port+"\n");
+  console.log('\nAdmin interface now available:\nhttp://' + ip.address() + ":" + addr.port + "/admin\n");
+  console.log('OBS add new "browser source" and use this address:\nhttp://' + ip.address() + ":" + addr.port + "\n");
 
 }

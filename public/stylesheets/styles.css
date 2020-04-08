@@ -237,3 +237,7 @@ canvas {
 .item.active {
     background: skyblue;
 }
+
+.ui.inverted.black.button {
+    color: black;
+}

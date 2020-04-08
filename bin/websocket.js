@@ -1,11 +1,15 @@
 
 const fs = require("fs");
+const config = require('../config.json');
 
 class websocket {
 
 
-    constructor(io) {
+    constructor(io, obs) {
         this.serverOptions = {
+            obs: {
+                currentScene: "",
+            },
             currentText: "",
             showTitle: false,
             titles: {
@@ -15,13 +19,23 @@ class websocket {
                 sub2: ""
             }
         }
+
+        this.obs = obs;
+        this.io = io;
         let self = this;
+
+
+        obs.on('SwitchScenes', data => {
+            self.serverOptions.obs.currentScene = data.sceneName;            
+            io.emit("obs.update", self.serverOptions);
+        });
 
         io.on('connection',
             /** @var {SocketIO.client} client */
             client => {
                 client.emit("update", self.serverOptions)
                 client.emit("callback.dataUpdate", self.getIndexFile());
+                self.getObsStatus(client);
 
                 client.on("showTitles", data => {
                     self.serverOptions.showTitle = true;
@@ -42,6 +56,10 @@ class websocket {
                     io.emit("update", self.serverOptions);
                 })
 
+                client.on("obs.setScene", async (scene) => {
+                    let data = await obs.send("SetCurrentScene", { 'scene-name': scene });
+                });
+
                 client.on("getData", () => {
                     io.emit("callback.dataUpdate", self.getIndexFile());
                 })
@@ -58,6 +76,28 @@ class websocket {
                     }
                 })
             });
+    }
+    async getObsStatus(socket) {
+        try {
+            let data = await this.obs.send("GetSceneList");
+            let outScenes = [];
+
+            for (let scene of data.scenes) {
+                let obj = {
+                    name: scene.name,
+                    enabled: false
+                }
+                if (config.obs.scenes.indexOf(scene.name) != -1) {
+                    obj.enabled = true;
+                }
+                outScenes.push(obj);
+            }
+
+            this.serverOptions.obs.currentScene = data.currentScene;
+            socket.emit("obs.scenelist", { currentScene: data.currentScene, scenes: outScenes });
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     getIndexFile() {

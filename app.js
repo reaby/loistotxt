@@ -1,19 +1,22 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var sassMiddleware = require('node-sass-middleware');
-var indexRouter = require('./routes/index');
-var fs = require('fs');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const sassMiddleware = require('node-sass-middleware');
+const indexRouter = require('./routes/index');
+const fs = require('fs');
+const app = express();
+const config = require('./config.json');
+const obsWebSocket = require('obs-websocket-js');
+const obs = new obsWebSocket();
 
-var app = express();
 console.log("LoistoTxt starting...");
 
 CheckDir("./data");
 CheckDir("./data/songs");
 CheckDir("./data/shows");
-
+connectObs();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -66,7 +69,33 @@ function CheckDir(directory) {
   }
 }
 
-module.exports = app;
+
+obs.on('error', err => {
+  console.error('OBS websocket error:', err);
+});
+
+obs.on('AuthenticationFailure', err => {
+  console.log("Authenticating OBS websocket failed.");
+  console.log("Check your config.json and try again.");
+  process.exit(1);
+})
+
+async function connectObs() {
+  try {
+    console.log("Connecting to local obs websocket!");
+
+    await obs.connect({
+      address: config.websocket.address || "127.0.0.1:4444",
+      password: config.websocket.password || ""
+    });
+  }
+  catch (e) {
+    console.log(e);
+  }
+}
+
+
+module.exports = { app, obs };
 
 
 
