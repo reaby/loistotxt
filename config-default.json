@@ -1,12 +1,13 @@
 {
-    "websocket": {
-        "address": "127.0.0.1:4444",
-        "password": "admin"
-    },
     "obs": {
+        "enabled": false,
         "scenes": [
             "Example1",
             "Example2"
-        ]
+        ],
+        "websocket": {
+            "address": "127.0.0.1:4444",
+            "password": "admin"
+        }
     }
 }

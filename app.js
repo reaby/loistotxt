@@ -16,7 +16,9 @@ console.log("LoistoTxt starting...");
 CheckDir("./data");
 CheckDir("./data/songs");
 CheckDir("./data/shows");
-connectObs();
+if (config.obs.enabled) {
+  connectObs();
+}
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -85,8 +87,8 @@ async function connectObs() {
     console.log("Connecting to local obs websocket!");
 
     await obs.connect({
-      address: config.websocket.address || "127.0.0.1:4444",
-      password: config.websocket.password || ""
+      address: config.obs.websocket.address || "127.0.0.1:4444",
+      password: config.obs.websocket.password || ""
     });
   }
   catch (e) {

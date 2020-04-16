@@ -20,13 +20,13 @@ class websocket {
             }
         }
 
-        this.obs = obs;
+        this.obs = obs || {};
         this.io = io;
         let self = this;
 
 
         obs.on('SwitchScenes', data => {
-            self.serverOptions.obs.currentScene = data.sceneName;            
+            self.serverOptions.obs.currentScene = data.sceneName;
             io.emit("obs.update", self.serverOptions);
         });
 
@@ -35,8 +35,10 @@ class websocket {
             client => {
                 client.emit("update", self.serverOptions)
                 client.emit("callback.dataUpdate", self.getIndexFile());
-                self.getObsStatus(client);
-
+                if (config.obs.enabled) {
+                    self.getObsStatus(client);
+                }
+                
                 client.on("showTitles", data => {
                     self.serverOptions.showTitle = true;
                     self.serverOptions.currentText = "";
@@ -58,9 +60,9 @@ class websocket {
 
                 client.on("obs.setScene", async (scene) => {
                     try {
-                    let data = await obs.send("SetCurrentScene", { 'scene-name': scene });
+                        let data = await obs.send("SetCurrentScene", { 'scene-name': scene });
                     } catch (e) {
-                       io.emit("obs.update", self.serverOptions);
+                        io.emit("obs.update", self.serverOptions);
                     }
                 });
 
@@ -101,6 +103,7 @@ class websocket {
             socket.emit("obs.scenelist", { currentScene: data.currentScene, scenes: outScenes });
         } catch (e) {
             console.log(e);
+            socket.emit("obs.scenelist", { currentScene: "", scenes: [] });
         }
     }
 

@@ -24,9 +24,11 @@ router.get('/ajax/song', function (req, res, next) {
 
 router.get('/ajax/song/:uuid', function (req, res, next) {
   let songData = {};
-  let file = './data/songs/' + req.params.uuid + ".json";
+  let file = './data/songs/' + req.params.uuid.toString() + ".json";
   if (fs.existsSync(file)) {
     songData = JSON.parse(fs.readFileSync(file).toString()) || {};
+  } else {
+    console.log("error, file not exists.");
   }
 
   res.json(songData);

@@ -1,11 +1,11 @@
 $(() => {
-    $.getJSON("/ajax/song/" + "{{ song }}", function (songData) {
+    $.getJSON("/ajax/song/" + song, function (songData) {
         let output = "";
         if (!Array.isArray(songData)) return;
         for (var data of songData) {
             output += `<div class="ui segment verse">
                     <div class="ui fluid labelled action input">                  
-                        <label class="ui label">Osan otsikko</label>
+                        <label class="ui label">Part title</label>
                         <input type="text" value="${data.title}" />
                         <button class="ui red inverted icon button" onclick="removeElem($(this).parent());"><i class="ui icon delete"></i>Delete part</button>
                     </div>
