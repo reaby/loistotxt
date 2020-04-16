@@ -3,11 +3,8 @@ var router = express.Router();
 var fs = require('fs');
 
 router.get('/', function (req, res, next) {
-  res.render('display', { title: '' });
-});
-
-router.get('/preview', function (req, res, next) {
-  res.render('preview', { title: '' });
+  let titleData = fs.readFileSync("./public/images/titles.svg").toString();
+  res.render('display', { titles: titleData });
 });
 
 router.get('/admin', function (req, res, next) {

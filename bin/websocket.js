@@ -12,7 +12,7 @@ class websocket {
             },
             currentText: "",
             showTitle: false,
-            titles: {
+            titles: {               
                 title1: "",
                 sub1: "",
                 title2: "",
@@ -38,7 +38,7 @@ class websocket {
                 if (config.obs.enabled) {
                     self.getObsStatus(client);
                 }
-                
+
                 client.on("showTitles", data => {
                     self.serverOptions.showTitle = true;
                     self.serverOptions.currentText = "";
