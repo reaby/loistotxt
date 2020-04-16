@@ -1,10 +1,10 @@
 # LoistoTxt
-Title and Subtitlegenerator for OBS with remote scene switcher possibility.
+Song lyrics and lower 3rd titles displayer to obs, vmix or any casting software that supports browser source. Additionally you can remote control whitelisted scenes at OBS (required additional plugin to install)
 
 ## Install
     
 1. Install `nodejs` and `npm` to your platform (win/linux/mac)
-2. Install [obs-websocket](https://github.com/Palakis/obs-websocket/releases) plugin to your obs and set it up.
+2. optionally Install [obs-websocket](https://github.com/Palakis/obs-websocket/releases) plugin to your obs and set it up.
 3. Get this repo to some folder at your computer
 
 ### Windows
@@ -20,20 +20,22 @@ Title and Subtitlegenerator for OBS with remote scene switcher possibility.
 2. start by writing `npm start` at console and follow instructions
 3. copy `config-default.json` to `config.json`
 4. edit config.json to match your settings
+
 ### config.json
 
 structure of the file is quite obvious:
 
     {
-      "websocket": {
-            "address": "127.0.0.1:4444",
-            "password": "admin"
-        },
         "obs": {
+            "enabled": false,
             "scenes": [
-                "Cam1",
-                "Cam2"
-            ]            
+                "Example1",
+                "Example2"
+            ],
+            "websocket": {
+                "address": "127.0.0.1:4444",
+                "password": "admin"
+            }
         }
     }
 
