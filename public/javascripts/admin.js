@@ -12,6 +12,37 @@ $(function () {
         }
     });
 
+    $('#loadTitle1').dropdown({
+        direction: "downward",
+        action: function (text, value) {
+            $("#title1").val(text);
+            $('#loadTitle1').dropdown("hide");
+        }
+    });
+
+    $('#loadTitle2').dropdown({
+        direction: "downward",
+        action: function (text, value) {
+            $("#title2").val(text);
+            $('#loadTitle2').dropdown("hide");
+        }
+    });
+
+    $('#loadSub1').dropdown({
+        direction: "downward",
+        action: function (text, value) {
+            $("#sub1").val(text);
+            $('#loadSub1').dropdown("hide");
+        }
+    });
+
+    $('#loadSub2').dropdown({
+        direction: "downward",
+        action: function (text, value) {
+            $("#sub2").val(text);
+            $('#loadSub2').dropdown("hide");
+        }
+    });
 
     /*  $('#file').dropdown({
           direction: "downward",
@@ -34,13 +65,11 @@ $(function () {
         if (this.resizeTO)
             clearTimeout(this.resizeTO);
 
-
-
         this.resizeTO = setTimeout(function () {
             $(this).trigger('viewportResize');
         }, 250);
     });
-
+    
     $(window).on('viewportResize', function () {
         $("#col1").css("height", ($(window).height() - (40 + $("#preview iframe").height() + $(".menu").height() * 2)) + "px")
         $("#col2").css("height", ($(window).height() - (20 + $(".menu").height() * 2)) + "px")
@@ -80,7 +109,7 @@ socket.on('obs.scenelist', data => {
     let output = "";
     obsScenes = data.scenes;
     serverOptions.obs.currentScene = data.currentScene;
-    
+
     let idx = 0;
     for (var scene of data.scenes) {
         let action = "";
@@ -101,7 +130,7 @@ socket.on('obs.scenelist', data => {
 });
 
 socket.on('obs.update', data => {
-    serverOptions = data;    
+    serverOptions = data;
     renderUI();
 });
 

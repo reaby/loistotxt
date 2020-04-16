@@ -5,50 +5,115 @@
 	<div class="ui primary top attached pointing menu">
 		<a class="header item" href="/admin">LoistoTxt</a>
 
-	<!--	<div id="file" class="ui dropdown item">
-			<div class="text">Show</div>
-			<i class="dropdown icon"></i>
-			<div class="menu">
-				<div class="item" data-value="new">New</div>
-				<div class="item" data-value="open">
-					Open...
-				</div>
-				<div class="item" data-value="save">
-					Save...
-				</div>
-			</div>
-		</div> -->
+		<!--	<div id="file" class="ui dropdown item">
+							<div class="text">Show</div>
+							<i class="dropdown icon"></i>
+							<div class="menu">
+								<div class="item" data-value="new">New</div>
+								<div class="item" data-value="open">
+									Open...
+								</div>
+								<div class="item" data-value="save">
+									Save...
+								</div>
+							</div>
+						</div> -->
 
 		<a class="browse item">
-			Titles
+			Create titles
 			<i class="dropdown icon"></i>
 		</a>
 		<div class="ui popup">
-			<div style="width: 60vw;" class="ui three column divided grid">
-				<div class="column">
-					<h4 class="ui header">Left</h4>
-					<div class="ui form list">
-						<input id="title1" class="ui input item" type="text"/>
-						<input id="sub1" class="ui input item" type="text"/>
+			<div style="width: 70vw;" class="ui two column divided grid">
+				<div class="row">
+					<div class="column">
+						<div class="ui form list">
+							<div class="ui right action left icon fluid input">
+								<i class="user icon"></i>
+								<input id="title1" type="text" placeholder="">
+								{% if titleData.titles %}
+									<div id="loadTitle1" class="ui basic floating dropdown button">
+										<div class="text">Load</div>
+										<i class="dropdown icon"></i>
+										<div class="menu">
+											{% for item in titleData.titles %}
+												<div class="item">{{item}}</div>
+											{% endfor %}
+										</div>
+									</div>
+								{% endif %}
+								<button class="ui icon button" onclick="$('#title1').val('');">
+									<i class="delete icon"></i>
+								</button>
+							</div>
+							<div class="ui right action left icon fluid input">
+								<i class="info icon"></i>
+								<input id="sub1" type="text" placeholder="">
+								{% if titleData.subs %}
+									<div id="loadSub1" class="ui basic floating dropdown button">
+										<div class="text">Load</div>
+										<i class="dropdown icon"></i>
+										<div class="menu">
+											{% for item in titleData.subs %}
+												<div class="item">{{item}}</div>
+											{% endfor %}
+										</div>
+									</div>
+								{% endif %}
+								<button class="ui icon button" onclick="$('#sub1').val('');">
+									<i class="delete icon"></i>
+								</button>
+							</div>
+						</div>
+					</div>
+					<div class="column">
+						<div class="ui form list">
+							<div class="ui right action left icon fluid input">
+								<i class="user icon"></i>
+								<input id="title2" type="text" placeholder="">
+								{% if titleData.titles %}
+									<div id="loadTitle2" class="ui basic floating dropdown button">
+										<div class="text">Load</div>
+										<i class="dropdown icon"></i>
+										<div class="menu">
+											{% for item in titleData.titles %}
+												<div class="item">{{item}}</div>
+											{% endfor %}
+										</div>
+									</div>
+								{% endif %}
+								<button class="ui icon button" onclick="$('#title2').val('');">
+									<i class="delete icon"></i>
+								</button>
+							</div>
+							<div class="ui right action left icon fluid input">
+								<i class="info icon"></i>
+								<input id="sub2" type="text" placeholder="">
+								{% if titleData.subs %}
+									<div id="loadSub2" class="ui basic floating dropdown button">
+										<div class="text">Load</div>
+										<i class="dropdown icon"></i>
+										<div class="menu">
+											{% for item in titleData.subs %}
+												<div class="item">{{item}}</div>
+											{% endfor %}
+										</div>
+									</div>
+								{% endif %}
+								<button class="ui icon button" onclick="$('#sub2').val('');">
+									<i class="delete icon"></i>
+								</button>
+							</div>
+						</div>
+						<div style="text-align: right">
+							<div id="toggleTitlesButton" class="ui inverted green button" onclick="toggleTitles();">Show Title</div>
+						</div>
 					</div>
 				</div>
-				<div class="column">
-					<h4 class="ui header">Right</h4>
-					<div class="ui form list">
-						<input id="title2" class="ui input item" type="text"/>
-						<input id="sub2" class="ui input item" type="text"/>
-					</div>
-				</div>
-				<div class="column">
-					<h4 class="ui header">Actions</h4>
-					<div class="ui list">
-						<div id="toggleTitlesButton" class="ui inverted green button" onclick="toggleTitles();">Show Title</div>
-					</div>
-				</div>
-
 			</div>
 		</div>
 
+		<!-- right menu -->
 		<div class="right menu">
 			<div class="item">
 				<div class="ui inverted buttons">
@@ -70,12 +135,13 @@
 			</div>
 		</div>
 	</div>
+	<!-- menu -->
+
 
 	<!-- Grids -->
 
 	<!-- <div class="ui three column grid" id="content" > -->
-	<div class="ui two column grid" id="content">
-		<div class="ui eight wide column">
+		<div class="ui two column grid" id="content"> <div class="ui eight wide column">
 			<div class="row">
 				<div class="ui inverted basic segment" style="overflow-y: none">
 					<div id="preview" data-url="/" class="ui 16:9 embed" style="background: gray; border: 1px solid black;"></div>
@@ -113,17 +179,15 @@
 <div
 	class="ui small primary bottom fixed pointing menu">
 	<!-- 
-	<div class="item" style="width: fit-content;">
-		<div class="ui text">Teksti ruudulle</div>
-		<form class="ui fluid action input" onsubmit="return update(event);">
-			<input style="width: 400px !important;" id="text" type="text" value="">
-			<button type="submit" class="ui small basic green button">Go</button>
-		</form>
-	</div> -->
+			<div class="item" style="width: fit-content;">
+				<div class="ui text">Teksti ruudulle</div>
+				<form class="ui fluid action input" onsubmit="return update(event);">
+					<input style="width: 400px !important;" id="text" type="text" value="">
+					<button type="submit" class="ui small basic green button">Go</button>
+				</form>
+			</div> -->
 
-	<div id="sceneList" class="item">	
-		
-	</div>
+	<div id="sceneList" class="item"></div>
 
 	<div class="right menu">
 		<div class="item">

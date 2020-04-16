@@ -3,12 +3,16 @@ var router = express.Router();
 var fs = require('fs');
 
 router.get('/', function (req, res, next) {
-  let titleData = fs.readFileSync("./public/images/titles.svg").toString();
-  res.render('display', { titles: titleData });
+  let titles = fs.readFileSync("./public/images/titles.svg").toString();
+  res.render('display', { titles: titles });
 });
 
 router.get('/admin', function (req, res, next) {
-  res.render('admin', { title: '' });
+  let data = "{}";
+  if (fs.existsSync("./data/titles.json")) {
+    data = JSON.parse(fs.readFileSync("./data/titles.json").toString());
+  }
+  res.render('admin', { titleData: data });
 });
 
 router.get('/admin/editsong', function (req, res, next) {
@@ -33,8 +37,11 @@ router.get('/ajax/song/:uuid', function (req, res, next) {
 
 router.post('/ajax/song', function (req, res, next) {
   let file = './data/songs/' + req.body.filename + ".json";
-  fs.writeFileSync(file, req.body.data || "[]");
-
+  try {
+    fs.writeFileSync(file, req.body.data || "[]");
+  } catch (e) {
+    console.log("Error while saving file: " + e);
+  }
   res.sendStatus(200);
 });
 
