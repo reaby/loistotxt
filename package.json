@@ -13,6 +13,7 @@
     "http-errors": "~1.6.3",
     "ip": "^1.1.5",
     "morgan": "~1.9.1",
+    "lodash": ">=4.17.19",
     "node-sass-middleware": "0.11.0",
     "obs-websocket-js": "^4.0.1",
     "socket.io": "^2.3.0",
