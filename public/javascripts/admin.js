@@ -113,10 +113,10 @@ socket.on('obs.scenelist', data => {
     let idx = 0;
     for (var scene of data.scenes) {
         let action = "";
-        let color = "disabled black";
+        let color = "disabled";
         if (scene.enabled) {
             action = `ondblClick="setScene('${scene.name}', this)"`;
-            color = "green";
+            color = "";
         }
 
         output += `
@@ -253,14 +253,12 @@ function renderUI() {
     } else {
         $('#toggleTitlesButton').addClass("inverted");
     }
+
     var idx = 0;
     $("#sceneList button").each(function (idx, elem) {
-
-        $(elem).addClass("inverted").removeClass("loading");
+        $(elem).removeClass("blue loading").addClass("black inverted");
         if (obsScenes[idx].name == serverOptions.obs.currentScene) {
-            console.log(obsScenes[idx].name);
-
-            $(elem).removeClass("inverted");
+            $(elem).removeClass("black inverted").addClass("blue");
         }
         idx++;
     });
@@ -292,6 +290,5 @@ function hideTitles() {
 
 function update(event) {
     event.preventDefault;
-
     return false;
 }

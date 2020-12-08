@@ -2,6 +2,8 @@
 
 {% block head %}
 	<style>
+		@import url('https://fonts.googleapis.com/css2?family=Finger+Paint&display=swap');
+		
 		html,
 		body {
 			background: none;
@@ -40,6 +42,11 @@
 			overflow: hidden;
 			display: none;
 		}
+
+		.title1, .title2 {
+		/*	font-family: 'Finger Paint' !important; */
+		}
+
 	</style>
 {% endblock %}
 
@@ -92,16 +99,16 @@ function renderView() {
 }
 </script>
 <script>
-	const animIn = "fadeInUp";
-	const animOut = "fadeOutDown fix";
+	const animIn = "fadeIn fix";
+	const animOut = "fadeOut fix";
 
 	function showTitles() {
 		$("#titles").html(serverOptions.titles.svg);
 		
 		document.getElementsByClassName("title1")[0].textContent = serverOptions.titles.title1;
 		document.getElementsByClassName("sub1")[0].textContent = serverOptions.titles.sub1
-		document.getElementsByClassName("title2")[0].textContent= serverOptions.titles.title2;
-		document.getElementsByClassName("sub2")[0].textContent = serverOptions.titles.sub2;
+	//	document.getElementsByClassName("title2")[0].textContent= serverOptions.titles.title2;
+	//	document.getElementsByClassName("sub2")[0].textContent = serverOptions.titles.sub2;
 		$('#titles').css("display","block");
 		$('#titles').removeClass(animOut).addClass(animIn);
 	}

@@ -2,7 +2,12 @@
 
 {% block body %}
 	<div class="ui primary top attached pointing menu" style="height: 40px !important;">
-		<input id="filename" class="header item" type="text" value="{{ song }}" placeholder="Filename"/>
+	 	<div class="item">
+      		<div class="ui icon input">
+	  			<i class="ui file alternate icon"></i>
+        		<input id="filename" type="text" value="{{ song }}" placeholder="Filename" class="ui input" />        		
+      		</div>
+		</div>
 		<div class="item">
 			<button class="ui small action button" onclick="redo();">
 				<i class="ui icon undo"></i>
@@ -23,9 +28,7 @@
 
 
 	<div class="ui inverted segment">
-		<h1>Edit a Song
-
-		</h1>
+		<h1> Song editor</h1>
 
 		<div class="">
 			<div id="songeditor"></div>
@@ -41,5 +44,6 @@
 		var socket = io.connect();
 		var song = "{{ song }}";
 	</script>
+	<script src="/javascripts/sortable.umd.js"></script>
 	<script src="/javascripts/editor.js"></script>
 {% endblock %}

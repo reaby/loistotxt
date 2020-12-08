@@ -4,7 +4,6 @@ const config = require('../config.json');
 
 class websocket {
 
-
     constructor(io, obs) {
         this.serverOptions = {
             obs: {
@@ -83,6 +82,7 @@ class websocket {
                 })
             });
     }
+    
     async getObsStatus(socket) {
         try {
             let data = await this.obs.send("GetSceneList");
@@ -123,17 +123,13 @@ class websocket {
             };
             data.songs.push(song);
         }
-        return data;
-
-        return JSON.parse(fs.readFileSync("./data/index.json").toString());
+        return data;     
     }
 
     getSongFile(filename) {
         return JSON.parse(fs.readFileSync("./data/songs/" + filename).toString());
     }
 
-
 }
-
 
 module.exports = websocket;

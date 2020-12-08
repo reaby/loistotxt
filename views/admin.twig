@@ -24,7 +24,7 @@
 			<i class="dropdown icon"></i>
 		</a>
 		<div class="ui popup">
-			<div style="width: 70vw;" class="ui two column divided grid">
+			<div style="width: 40vw;" class="ui one column divided grid">
 				<div class="row">
 					<div class="column">
 						<div class="ui form list">
@@ -65,50 +65,9 @@
 								</button>
 							</div>
 						</div>
-					</div>
-					<div class="column">
-						<div class="ui form list">
-							<div class="ui right action left icon fluid input">
-								<i class="user icon"></i>
-								<input id="title2" type="text" placeholder="">
-								{% if titleData.titles %}
-									<div id="loadTitle2" class="ui basic floating dropdown button">
-										<div class="text">Load</div>
-										<i class="dropdown icon"></i>
-										<div class="menu">
-											{% for item in titleData.titles %}
-												<div class="item">{{item}}</div>
-											{% endfor %}
-										</div>
-									</div>
-								{% endif %}
-								<button class="ui icon button" onclick="$('#title2').val('');">
-									<i class="delete icon"></i>
-								</button>
-							</div>
-							<div class="ui right action left icon fluid input">
-								<i class="info icon"></i>
-								<input id="sub2" type="text" placeholder="">
-								{% if titleData.subs %}
-									<div id="loadSub2" class="ui basic floating dropdown button">
-										<div class="text">Load</div>
-										<i class="dropdown icon"></i>
-										<div class="menu">
-											{% for item in titleData.subs %}
-												<div class="item">{{item}}</div>
-											{% endfor %}
-										</div>
-									</div>
-								{% endif %}
-								<button class="ui icon button" onclick="$('#sub2').val('');">
-									<i class="delete icon"></i>
-								</button>
-							</div>
-						</div>
-						<div style="text-align: right">
-							<div id="toggleTitlesButton" class="ui inverted green button" onclick="toggleTitles();">Show Title</div>
-						</div>
-					</div>
+					</div>											
+					<button id="toggleTitlesButton" class="ui inverted green button" onclick="toggleTitles();">Show Title</button>						
+					
 				</div>
 			</div>
 		</div>

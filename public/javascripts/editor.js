@@ -1,72 +1,133 @@
+var sortable = null;
+var undoData = [];
+
 $(() => {
     $.getJSON("/ajax/song/" + song, function (songData) {
         let output = "";
         if (!Array.isArray(songData)) return;
-        for (var data of songData) {
-            output += `<div class="ui segment verse">
-                    <div class="ui fluid labelled action input">                  
-                        <label class="ui label">Part title</label>
-                        <input type="text" value="${data.title}" />
-                        <button class="ui red inverted icon button" onclick="removeElem($(this).parent());"><i class="ui icon delete"></i>Delete part</button>
-                    </div>
-                
-                    <div class="verseContent">
+        for (let data of songData) {
+            output += `<div class="ui segment verse">                                                            
+                                <div class="ui fluid labelled action input">                                               
+                                    <label class="ui label handle"><i class="ui icon move"></i> Title</label>
+                                    <input class="ui input" type="text" value="${data.title}" />
+                                    <button class="ui red inverted icon button" onclick="removeElem($(this).parent());"><i class="ui trash icon"></i>Delete part</button>
+                                </div>
+                    
+                                <div class="verseContent" style="margin-top: 1rem;">
                 `;
-            for (var line of data.texts) {
-                output += `<div class="ui fluid action input">
-                            <textarea rows="1" cols="120">${line}</textarea>
-                            <button class="ui red inverted icon button" onclick="removeElem(this);"><i class="ui icon delete"></i></button>
+            for (let line of data.texts) {
+                output += `<div class="ui fluid action input" style="margin-top: 0.5rem;">
+                            <div style="margin-left: 3rem;" class="ui icon button handle"><i class="ui icon move"></i></div>
+                            <textarea rows="1" cols="120" class="textarea" oninput="onEdit(this)" onchange="snap">${line}</textarea>
+                            <button style="margin-left: 0.25rem;" class="ui red inverted icon button" onclick="removeElem(this);"><i class="ui trash icon"></i></button>
+                            <button style="margin-left: 0.25rem;" class="ui red inverted icon button" onclick="duplicateElem(this);"><i class="clone outline icon"></i></button>
                     </div>`;
             }
             output += `</div>`;
-            output += `<button class="ui green inverted icon button" onclick="addText(this);"><i class="ui icon add"></i></button>`;
-            output += `</div>`;
+            output += `<button style="margin-top: 1rem;" class="ui green inverted icon button" onclick="addText(this);"><i class="ui icon add"></i> Add Text</button>`;
+            output += `</div></div>`;
 
         }
         output += ``;
         $('#songeditor').html(output);
+        setUndoPoint();        
+        update();
+    });
+});
+
+function update() {
+    let verses = document.querySelector("#songeditor");
+    new Sortable(verses, {
+        handle: ".handle",
+        group: 'verses',
+        animation: 150
     });
 
-});
-var undoData = null;
+    let songeditor = document.querySelectorAll(".verseContent");
+    for (var i = 0; i < songeditor.length; i++) {
+        new Sortable(songeditor[i], {
+            handle: ".handle",
+            group: 'lines',
+            animation: 150
+        });       
+    }
+
+    let x = 0;
+    for (let input of document.querySelectorAll("input")) {
+        x += 1;
+        input.tabIndex = x;
+        for(let textarea of input.parentElement.parentElement.querySelectorAll("textarea")) {
+            textarea.tabIndex = x;    
+            x += 1;
+        }        
+    }
+
+}
 
 function removeElem(elem) {
-    undoData = $("#songeditor").clone();
+    setUndoPoint();      
     $(elem).parent().remove();
 }
 
 
 function addVerse() {
-    undoData = $("#songeditor").clone();
-    output = `<div class="ui segment verse">
+    setUndoPoint();
+    output = `<div class="ui segment verse">                   
                     <div class="ui fluid labelled action input">                  
-                        <label class="ui label">Title</label>
-                        <input type="text" value="" />
-                        <button class="ui red inverted icon button" onclick="removeElem($(this).parent());"><i class="ui icon delete"></i>Delete part</button>
+                        <label class="ui label handle"><i class="ui icon move"></i> Title</label>
+                        <input class="ui input"  type="text" value="" autofocus="1" />
+                        <button class="ui red inverted icon button" onclick="removeElem($(this).parent());"><i class="ui trash icon"></i>Delete part</button>
                     </div>
                 
-                    <div class="verseContent">
+                    <div class="verseContent" style="margin-top: 1rem;">
                     </div>
-                    <button class="ui green inverted icon button" onclick="addText(this);"><i class="ui icon add"></i></button>
+                    <button style="margin-top: 1rem;" class="ui green inverted icon button" onclick="addText(this);"><i class="ui icon add"></i>Add Text</button>                 
                     </div>
                 `;
     $("#songeditor").append(output);
+    $("#songeditor input").last().focus();
+
+    update();
 }
 
 
-function redo() {
-    if (undoData !== null) {
-        $("#songeditor").html(undoData);
+function setUndoPoint() {
+    let history = 10;
+    if( undoData.length > history) {        
+        undoData = undoData.slice(0, history);
     }
+    undoData.unshift($("#songeditor").clone());
+}
+
+function redo() {
+    data = undoData.shift();
+    if (undoData !== null) {
+        $("#songeditor").html(data);
+    }
+}
+function duplicateElem(elem) {
+    setUndoPoint();
+    $(elem).parent().parent().append($(elem).parent().clone());
 }
 
 function addText(elem) {
-    undoData = $("#songeditor").clone();
-    $(elem).siblings().last().append(`<div class="ui fluid action input">
-                            <textarea rows="1" cols="120"></textarea>
-                            <button class="ui red inverted icon button" onclick="removeElem(this);"><i class="ui icon delete"></i></button>
+    setUndoPoint();
+    $(elem).siblings().last().append(`<div class="ui fluid action input text" style="margin-top: 0.5rem;">
+                            <div style="margin-left: 3rem;" class="ui icon button handle"><i class="ui icon move"></i></div>
+                            <textarea class="textarea" rows="1" cols="120" oninput="onEdit(this)"></textarea>
+                            <button style="margin-left: 0.25rem;" class="ui red inverted icon button" onclick="removeElem(this);"><i class="ui trash icon"></i></button>
+                            <button style="margin-left: 0.25rem;" class="ui red inverted icon button" onclick="duplicateElem(this);"><i class="clone outline icon"></i></button>
                     </div>`);
+    update();
 }
+
+function onEdit(ref) {
+    let lines = ref.value.split("\n");
+    if (lines.length >= 2) {
+        ref.value = lines[0] + "\n" + lines[1];
+    }
+}
+
 
 async function save() {
 
