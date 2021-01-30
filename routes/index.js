@@ -9,14 +9,30 @@ router.get('/', function (req, res, next) {
 
 router.get('/admin', function (req, res, next) {
   let data = "{}";
-  if (fs.existsSync("./data/titles.json")) {
-    data = JSON.parse(fs.readFileSync("./data/titles.json").toString());
+  if (fs.existsSync("./data/status.json")) {
+    data = JSON.parse(fs.readFileSync("./data/status.json").toString());
   }
-  res.render('admin', { titleData: data });
+  const files = fs.readdirSync("./data/shows") ?? {};
+
+  res.render('admin', { status: data, showFiles: files });
 });
 
 router.get('/admin/editsong', function (req, res, next) {
   res.render('editsong', { title: '', song: req.query.uuid || "" });
+});
+
+router.get('/ajax/songs', function (req, res, next) {
+  let songs = fs.readdirSync("./data/songs");
+  let outData = [];
+  for (song of songs) {
+    let info = JSON.parse(fs.readFileSync("./data/songs/" + song).toString());
+    outData.push({ title: info.title, artist: info.artist, file: song });
+  }
+  res.json(outData);
+});
+
+router.get('/ajax/shows', function (req, res, next) {
+  res.json(fs.readdirSync("./data/shows"));
 });
 
 router.get('/ajax/song', function (req, res, next) {
@@ -25,7 +41,7 @@ router.get('/ajax/song', function (req, res, next) {
 
 router.get('/ajax/song/:uuid', function (req, res, next) {
   let songData = {};
-  let file = './data/songs/' + req.params.uuid.toString() + ".json";
+  let file = './data/songs/' + req.params.uuid.toString();
   if (fs.existsSync(file)) {
     songData = JSON.parse(fs.readFileSync(file).toString()) || {};
   } else {
@@ -36,7 +52,7 @@ router.get('/ajax/song/:uuid', function (req, res, next) {
 });
 
 router.post('/ajax/song', function (req, res, next) {
-  let file = './data/songs/' + req.body.filename + ".json";
+  let file = './data/songs/' + req.body.filename.replace(".json", "") + ".json";
   try {
     fs.writeFileSync(file, req.body.data || "[]");
   } catch (e) {

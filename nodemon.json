@@ -1,0 +1,7 @@
+{
+    "ignore": [
+        ".git",
+        "data/**"
+    ],
+    "ext": "js,twig,css"
+}

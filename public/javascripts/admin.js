@@ -1,6 +1,18 @@
+var socket = io.connect();
+var serverOptions = {};
+var indexData = {};
+var songData = {};
+var texts = [];
+var currentIdx = -1;
+var currentSong = -1;
+var obsScenes = [];
+var sortableTitles = null;
+
 
 $(function () {
     $("#preview").embed();
+
+    $("#tab .item").tab();
 
     $('.menu .browse').popup({
         inline: true,
@@ -44,23 +56,23 @@ $(function () {
         }
     });
 
-    /*  $('#file').dropdown({
-          direction: "downward",
-          action: function (text, value) {
-              switch (value) {
-                  case "new":
-  
-                      break;
-                  case "open":
-                      console.log("open");
-                      break;
-                  case "save":
-                      console.log("save");
-                      break;
-              }
-          }
-      });
-  */
+    $('#file').dropdown({
+        direction: "downward",
+        action: function (text, value) {
+            switch (value) {
+                case "new":
+                    break;
+                case "open":
+                    openShow();
+                    break;
+                case "save":
+                    saveShow();
+                    break;
+            }
+            $('#file').dropdown("hide");
+        }
+    });
+
     $(window).resize(function () {
         if (this.resizeTO)
             clearTimeout(this.resizeTO);
@@ -69,9 +81,10 @@ $(function () {
             $(this).trigger('viewportResize');
         }, 250);
     });
-    
+
     $(window).on('viewportResize', function () {
-        $("#col1").css("height", ($(window).height() - (40 + $("#preview iframe").height() + $(".menu").height() * 2)) + "px")
+        //  $("#col1").css("height", ($(window).height() - (40 + $("#preview iframe").height() + $(".menu").height() * 2)) + "px")
+        $("#col1").css("height", ($(window).height() - (20 + $(".menu").height() * 2)) + "px")
         $("#col2").css("height", ($(window).height() - (20 + $(".menu").height() * 2)) + "px")
         $("#col3").css("height", ($(window).height() - (20 + $(".menu").height() * 2)) + "px")
     });
@@ -79,30 +92,21 @@ $(function () {
     $(window).trigger('viewportResize');
 });
 
-
-var socket = io.connect();
-var serverOptions = {};
-var indexData = {};
-var songName = "";
-var songData = {};
-var texts = [];
-var currentIdx = -1;
-var obsScenes = [];
-
 socket.on("update", data => {
     serverOptions = data;
     renderUI();
 });
 
-socket.on("callback.dataUpdate", data => {
-    indexData = data;
-    updateSongs(data);
+socket.on("updateAll", data => {
+    serverOptions = data;
+    updateSongs();
+    $("#showTitle").val(data.showData.name);
+    renderUI();
 });
 
 socket.on("callback.loadSong", data => {
-    songName = data.name;
-    songData = data.data;
-    updateSong();
+    updateSong(data);
+    renderUI();
 });
 
 socket.on('obs.scenelist', data => {
@@ -134,23 +138,115 @@ socket.on('obs.update', data => {
     renderUI();
 });
 
+function renameShow() {
+    socket.emit("renameShow", $("#showTitle").val());
+}
 
-function updateSongs(data) {
+function openShow() {
+    $('.fileAction').text("Open");
+    $("#dialogFilename").val("");
+    $.getJSON("/ajax/shows", function (json) {
+        let data = ``;
+        for (let elem of json) {
+            data += `
+            <div class="item" onclick="selectShowFile(this);">
+                <i class="file icon"></i>
+                <div class="content noselect">
+                    <div class="header">${elem}</div>
+                </div>
+            </div>`;
+        }
+        $("#showContent").html(data);
+        $('#showDialog').modal({
+            blurring: true,
+            onApprove: function () {
+                socket.emit("loadShow", $("#dialogFilename").val());
+            }
+        }).modal('show');
+    });
+
+}
+
+function saveShow() {
+    $('.fileAction').text("Save");
+    $("#dialogFilename").val("");
+    $.getJSON("/ajax/shows", function (json) {
+        let data = ``;
+        for (let elem of json) {
+            data += `
+            <div class="item" onclick="selectShowFile(this);">
+                <i class="file icon"></i>
+                <div class="content noselect">
+                    <div class="header">${elem}</div>
+                </div>
+            </div>`;
+        }
+        $("#showContent").html(data);
+        $('#showDialog').modal({
+            blurring: true,
+            onApprove: function () {
+                socket.emit("saveShow", $("#dialogFilename").val());
+            }
+        }).modal('show');
+    });
+}
+
+function importSongs() {
+    $.getJSON("/ajax/songs", function (json) {
+        let data = ``;
+        for (let elem of json) {
+            data += `
+            <div class="item">
+                <div class="right floated middle aligned content noselect">
+                    <div class="ui button" onclick="editSong('${elem.file}')">Edit</div>
+                    <div class="ui green button" onclick="addSong('${elem.file}')">Import</div>
+             
+                </div>
+         
+                <div class="content noselect">
+                    <i class="music icon"></i>${elem.title} (${elem.artist})
+                </div>
+               
+            </div>`;
+        }
+        $("#songContent").html(data);
+        $('#songDialog').modal({
+            blurring: true
+        }).modal('show');
+    });
+}
+
+
+
+function updateSongs() {
     let output = "";
-    for (var song of data.songs) {
+    let i = 0;
+    for (var song of serverOptions.showData.songs) {
         output += `
-        <div class="ui green message item">
-            <div class="right floated content">
-                <button class="ui small basic inverted icon button" onclick="editSong('${song.id}')"><i class="edit icon"></i></button>
-                <button class="ui small basic inverted icon button" onclick="loadSong('${song.id}')"><i class="play icon"></i></button>
+        <div class="ui left aligned gray message inverted item" data-song="${song.file}" onclick="loadSong('${song.file}', ${i})">
+            <div class="right floated content noselect">
+                <button class="ui small basic inverted icon button" onclick="removeSong(${i})"><i class="delete icon"></i></button>
             </div>
-            <div class="content">
-                <div> ${song.title}</div>
+            <div class="ui content noselect">
+                 <div class="ui inverted basic icon button handle"><i class="move icon"></i></div>
+                 <i class="music icon"></i> ${song.title} (${song.artist})
             </div>
         </div>`;
+        i++;
     }
 
     $('#allSongs').html(output);
+
+    let allSongs = document.querySelector("#allSongs");
+    new Sortable(allSongs, {
+        handle: ".handle",
+        group: 'songs',
+        animation: 150,
+        onEnd: function (evt) {
+            socket.emit("moveSong", evt.oldIndex, evt.newIndex);
+        }
+    });
+
 }
 
 function setScene(name, elem) {
@@ -158,33 +254,48 @@ function setScene(name, elem) {
     socket.emit("obs.setScene", name);
 }
 
-function updateSong() {
-    let output = "<h1>" + songName + "</h1>";
+function updateSong(input) {
+    songData = input.data;
+    let output = `<h3 style="margin-bottom: 0;">${songData.artist}</h3><h1 style="margin-top:0;">${songData.title}</h1>`;
     texts = [];
     currentIdx = -1;
     let idx = 0;
-    for (var data of songData) {
-        output += `<h5>${
-            data.title
-            }</h5>`;
+    for (var data of songData.songData) {
+        output += `<h3>${data.title}</h3>`;
         for (var line of data.texts) {
             texts.push(line.replace("\n", "<br>"));
             output += `
-            <div id="text_${idx}" class="ui message item" onclick="sendText(${idx})">            
+            <div id="text_${idx}" class="ui inverted gray message item" onclick="sendText(${idx})">            
                 <div class="content noselect">
                         ${line.replace("\n", '<br>')}
                 </div>
             </div>`;
             idx++;
         }
-
     }
 
     $('#song').html(output);
 }
 
-function loadSong(songid) {
+function loadSong(songid, index) {
     socket.emit("loadSong", songid);
+    currentSong = songid;
+}
+
+function addSong(file) {
+    socket.emit("addSong", file);
+}
+
+function removeSong(songid) {
+    if (confirm("are you sure ?")) {
+        socket.emit("removeSong", songid);
+    }
+}
+
+function removeTitle(id) {
+    if (confirm("are you sure ?")) {
+        socket.emit("removeTitle", id);
+    }
 }
 
 function sendText(idx) {
@@ -247,6 +358,7 @@ function createNewSong() {
     editSong("");
 }
 
+
 function renderUI() {
     if (serverOptions.showTitle === true) {
         $('#toggleTitlesButton').removeClass("inverted");
@@ -254,7 +366,6 @@ function renderUI() {
         $('#toggleTitlesButton').addClass("inverted");
     }
 
-    var idx = 0;
     $("#sceneList button").each(function (idx, elem) {
         $(elem).removeClass("blue loading").addClass("black inverted");
         if (obsScenes[idx].name == serverOptions.obs.currentScene) {
@@ -263,6 +374,57 @@ function renderUI() {
         idx++;
     });
 
+    if (currentSong != "") {
+        $("#allSongs .item").each(function (idx, elem) {
+            $(elem).removeClass("green").addClass("gray");
+            if (elem.dataset.song == currentSong) {
+                $(elem).removeClass('gray').addClass("green");
+            }
+        });
+    }
+
+    let titles = "";
+    i = 0;
+    for (var title of serverOptions.showData.titles) {
+        titles += `
+        <div class="ui left aligned gray message inverted item" data-idx="${title[0]}">
+        <div class="right floated content noselect">
+            <button class="ui small basic inverted icon button" onclick="removeTitle(${i})"><i class="delete icon"></i></button>
+        </div>
+        <div class="ui content noselect" onclick="showTitle(${i})">
+             <div class="ui inverted basic icon button handle"><i class="move icon"></i></div>
+             ${title[0]}
+        </div>
+        </div>`;
+        i++;
+    }
+
+    $('#myTitles').html(titles);
+
+    $("#myTitles .item").each(function (idx, elem) {
+        $(elem).removeClass("active")
+        if (serverOptions.titles.index != undefined && elem.dataset.idx === serverOptions.titles.title1) {
+            $(elem).addClass("active");
+        }
+    });
+    if (sortableTitles) sortableTitles.destroy();
+
+    sortableTitles = new Sortable(document.querySelector("#myTitles"), {
+        handle: ".handle",
+        group: 'titles',
+        animation: 150,
+        onEnd: function (evt) {
+            socket.emit("moveTitle", evt.oldIndex, evt.newIndex);
+        }
+    });
+
+}
+
+function createTitle() {
+    if ($("#newTitle").val() != "") {
+        socket.emit("createTitle", $("#newTitle").val());
+        $("#newTitle").val("");
+    }
 }
 
 function toggleTitles() {
@@ -273,6 +435,10 @@ function toggleTitles() {
     }
 }
 
+function selectShowFile(elem) {
+    var file = $(elem).find(".header").text();
+    $('#dialogFilename').val(file);
+}
 
 function showTitles() {
     let data = {
@@ -282,6 +448,22 @@ function showTitles() {
         sub2: $("#sub2").val()
     };
     socket.emit("showTitles", data);
+}
+
+function showTitle(index) {
+    if (serverOptions.showTitle === true) {
+        hideTitles();
+    } else {
+        let titles = serverOptions.showData.titles;
+        if (titles[index]) {
+            let data = {
+                index: index,
+                title1: titles[index][0],
+                sub1: titles[index][1]
+            };
+            socket.emit("showTitles", data);
+        }
+    }
 }
 
 function hideTitles() {

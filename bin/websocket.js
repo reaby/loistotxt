@@ -10,8 +10,17 @@ class websocket {
                 currentScene: "",
             },
             currentText: "",
+
+            currentShow: "",
+            showData: {
+                name: "",
+                titles: [],
+                songs: []
+            },
+
             showTitle: false,
             titles: {
+                index: -1,
                 title1: "",
                 sub1: "",
                 title2: "",
@@ -32,8 +41,8 @@ class websocket {
         io.on('connection',
             /** @var {SocketIO.client} client */
             client => {
-                client.emit("update", self.serverOptions)
-                client.emit("callback.dataUpdate", self.getIndexFile());
+                client.emit("updateAll", self.serverOptions);
+
                 if (config.obs.enabled) {
                     self.getObsStatus(client);
                 }
@@ -48,6 +57,7 @@ class websocket {
                 client.on("hideTitles", data => {
                     self.serverOptions.showTitle = false;
                     self.serverOptions.currentText = "";
+                    self.serverOptions.titles = {};
                     io.emit("update", self.serverOptions);
                 });
 
@@ -59,7 +69,7 @@ class websocket {
 
                 client.on("obs.setScene", async (scene) => {
                     try {
-                        let data = await obs.send("SetCurrentScene", { 'scene-name': scene });
+                        await obs.send("SetCurrentScene", { 'scene-name': scene });
                     } catch (e) {
                         io.emit("obs.update", self.serverOptions);
                     }
@@ -67,19 +77,85 @@ class websocket {
 
                 client.on("getData", () => {
                     io.emit("callback.dataUpdate", self.getIndexFile());
+                });
+
+                client.on("moveSong", (oldIndex, newIndex) => {
+                    let song = self.serverOptions.showData.songs.splice(oldIndex, 1);
+                    self.serverOptions.showData.songs.splice(newIndex, 0, song[0]);
+                    io.emit("updateAll", self.serverOptions);
+                });
+
+                client.on("moveTitle", (oldIndex, newIndex) => {
+                    let song = self.serverOptions.showData.titles.splice(oldIndex, 1);
+                    self.serverOptions.showData.titles.splice(newIndex, 0, song[0]);
+                    io.emit("update", self.serverOptions);
+                });
+
+                client.on("renameShow", (newName) => {
+                    self.serverOptions.showData.name = newName;
+                    io.emit("updateAll", self.serverOptions);
+                });
+
+                client.on("addSong", (file) => {
+                    try {
+                        let songMeta = JSON.parse(fs.readFileSync("./data/songs/" + file).toString());
+                        self.serverOptions.showData.songs.push({ artist: songMeta.artist, title: songMeta.title, file: file });
+                        io.emit("updateAll", self.serverOptions);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                });
+
+                client.on("removeSong", (i) => {
+                    try {
+                        self.serverOptions.showData.songs.splice(i, 1);
+                        io.emit("updateAll", self.serverOptions);
+                    } catch (e) {
+                        console.log(e);
+                    } 0
+                });
+
+                client.on("removeTitle", (i) => {
+                    try {
+                        self.serverOptions.showData.titles.splice(i, 1);
+                        io.emit("update", self.serverOptions);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                });
+
+                client.on("createTitle", (newTitle) => {
+                    self.serverOptions.showData.titles.push([newTitle, ""]);
+                    io.emit("update", self.serverOptions);
                 })
 
-                client.on("loadSong", songid => {
-                    let indexData = self.getIndexFile();
-                    for (let song of indexData.songs) {
-                        if (song.id == songid) {
-                            client.emit("callback.loadSong", {
-                                name: song.title,
-                                data: self.getSongFile(song.file)
-                            });
+                client.on("loadShow", (file) => {
+                    try {
+                        if (fs.existsSync("./data/shows/" + file)) {
+                            self.serverOptions.showData = JSON.parse(fs.readFileSync("./data/shows/" + file).toString());
+                            self.serverOptions.currentShow = file;
+                            client.emit("updateAll", self.serverOptions);
                         }
+                    } catch (error) {
+                        console.log(error);
                     }
-                })
+                });
+
+                client.on("saveShow", (file) => {
+                    try {
+                        file = file.replace(".json", "") + ".json";
+                        let fileData = JSON.stringify(self.serverOptions.showData);
+                        fs.writeFileSync("./data/shows/" + file, fileData);
+                        client.emit("updateAll", self.serverOptions);
+                    } catch (error) {
+                        console.log(error);
+                    }
+                });
+
+
+                client.on("loadSong", file => {
+                    client.emit("callback.loadSong", self.getSong(file));
+                });
             });
     }
 
@@ -126,10 +202,9 @@ class websocket {
         return data;
     }
 
-    getSongFile(filename) {
-        return JSON.parse(fs.readFileSync("./data/songs/" + filename).toString());
+    getSong(filename) {
+        return { file: filename, data: JSON.parse(fs.readFileSync("./data/songs/" + filename).toString()) };
     }
-
 }
 
 module.exports = websocket;

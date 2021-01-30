@@ -24,19 +24,26 @@ iframe {
   cursor: default;
 }
 
-.slides .ui.item {
+#song .item .content {
   padding: 0.5rem;
   margin: 3px 0;
   box-shadow: none;
 }
 
 .slides .ui.green.message {
-  background: #08200b;
+  background: #114117;
   border: 1px solid black;
 }
 
-.slides .ui.red.message {
-  background: #200c0c;
+.ui.gray.message.active {
+  background: #114117;
+  color: #1ebc30;
+  border: 1px solid black;
+}
+
+.ui.gray.message {
+  background: #333;
+  border: 1px solid black;
 }
 
 .gpu {
@@ -57,4 +64,24 @@ iframe {
 
 .textarea {
   resize: none;
+}
+
+#showDialog .ui.list .item {
+  padding: 0.5rem;
+}
+
+#showDialog .ui.list .item:hover {
+  background: skyblue;
+}
+
+#allSongs .message {
+  margin: 0;
+}
+
+.ui.inverted.segment .verse {
+  background: rgb(53, 54, 54);
+}
+
+#songeditor .red.button {
+  background: maroon;
 }
