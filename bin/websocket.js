@@ -79,6 +79,7 @@ class websocket {
                     io.emit("callback.dataUpdate", self.getIndexFile());
                 });
 
+          
                 client.on("moveSong", (oldIndex, newIndex) => {
                     let song = self.serverOptions.showData.songs.splice(oldIndex, 1);
                     self.serverOptions.showData.songs.splice(newIndex, 0, song[0]);
@@ -128,6 +129,16 @@ class websocket {
                     self.serverOptions.showData.titles.push([newTitle, ""]);
                     io.emit("update", self.serverOptions);
                 })
+
+                client.on("newShow", () => {
+                    self.serverOptions.currentShow = "";
+                    self.serverOptions.showData = {
+                        name: "",
+                        titles: [],
+                        songs: []
+                    }
+                    client.emit("updateAll", self.serverOptions);
+                });
 
                 client.on("loadShow", (file) => {
                     try {

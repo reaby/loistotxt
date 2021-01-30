@@ -26,13 +26,18 @@ router.get('/ajax/songs', function (req, res, next) {
   let outData = [];
   for (song of songs) {
     let info = JSON.parse(fs.readFileSync("./data/songs/" + song).toString());
-    outData.push({ title: info.title, artist: info.artist, file: song });
+    outData.push({ title: info.title, artist: info.artist, file: song, actions: "" });
   }
-  res.json(outData);
+  res.json({ data: outData });
 });
 
 router.get('/ajax/shows', function (req, res, next) {
-  res.json(fs.readdirSync("./data/shows"));
+  let data = fs.readdirSync("./data/shows");
+  let out = [];
+  for (elem of data) {
+    out.push({ file: elem });
+  }
+  res.json({ data: out });
 });
 
 router.get('/ajax/song', function (req, res, next) {

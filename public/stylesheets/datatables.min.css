@@ -1,0 +1,18 @@
+/*
+ * This combined file was created by the DataTables downloader builder:
+ *   https://datatables.net/download
+ *
+ * To rebuild or modify this file with the latest versions of the included
+ * software please visit:
+ *   https://datatables.net/download/#se/jq-3.3.1/dt-1.10.23/sc-2.0.3
+ *
+ * Included libraries:
+ *   jQuery 3 3.3.1, DataTables 1.10.23, Scroller 2.0.3
+ */
+
+﻿table.dataTable.table{margin:0}table.dataTable.table thead th,table.dataTable.table thead td{position:relative}table.dataTable.table thead th.sorting,table.dataTable.table thead th.sorting_asc,table.dataTable.table thead th.sorting_desc,table.dataTable.table thead td.sorting,table.dataTable.table thead td.sorting_asc,table.dataTable.table thead td.sorting_desc{padding-right:20px}table.dataTable.table thead th.sorting:after,table.dataTable.table thead th.sorting_asc:after,table.dataTable.table thead th.sorting_desc:after,table.dataTable.table thead td.sorting:after,table.dataTable.table thead td.sorting_asc:after,table.dataTable.table thead td.sorting_desc:after{position:absolute;top:12px;right:8px;display:block;font-family:Icons}table.dataTable.table thead th.sorting:after,table.dataTable.table thead td.sorting:after{content:"";color:#ddd;font-size:.8em}table.dataTable.table thead th.sorting_asc:after,table.dataTable.table thead td.sorting_asc:after{content:""}table.dataTable.table thead th.sorting_desc:after,table.dataTable.table thead td.sorting_desc:after{content:""}table.dataTable.table td,table.dataTable.table th{-webkit-box-sizing:content-box;box-sizing:content-box}table.dataTable.table td.dataTables_empty,table.dataTable.table th.dataTables_empty{text-align:center}table.dataTable.table.nowrap th,table.dataTable.table.nowrap td{white-space:nowrap}div.dataTables_wrapper div.dataTables_length select{vertical-align:middle;min-height:2.7142em}div.dataTables_wrapper div.dataTables_length .ui.selection.dropdown{min-width:0}div.dataTables_wrapper div.dataTables_filter span.input{margin-left:.5em}div.dataTables_wrapper div.dataTables_info{padding-top:13px;white-space:nowrap}div.dataTables_wrapper div.dataTables_processing{position:absolute;top:50%;left:50%;width:200px;margin-left:-100px;text-align:center}div.dataTables_wrapper div.row.dt-table{padding:0}div.dataTables_wrapper div.dataTables_scrollHead table.dataTable{border-bottom-right-radius:0;border-bottom-left-radius:0;border-bottom:none}div.dataTables_wrapper div.dataTables_scrollBody thead .sorting:after,div.dataTables_wrapper div.dataTables_scrollBody thead .sorting_asc:after,div.dataTables_wrapper div.dataTables_scrollBody thead .sorting_desc:after{display:none}div.dataTables_wrapper div.dataTables_scrollBody table.dataTable{border-radius:0;border-top:none;border-bottom-width:0}div.dataTables_wrapper div.dataTables_scrollBody table.dataTable.no-footer{border-bottom-width:1px}div.dataTables_wrapper div.dataTables_scrollFoot table.dataTable{border-top-right-radius:0;border-top-left-radius:0;border-top:none}
+
+
+div.dts{display:block !important}div.dts tbody th,div.dts tbody td{white-space:nowrap}div.dts div.dts_loading{z-index:1}div.dts div.dts_label{position:absolute;right:10px;background:rgba(0,0,0,0.8);color:white;box-shadow:3px 3px 10px rgba(0,0,0,0.5);text-align:right;border-radius:3px;padding:0.4em;z-index:2;display:none}div.dts div.dataTables_scrollBody{background:repeating-linear-gradient(45deg, #edeeff, #edeeff 10px, #fff 10px, #fff 20px)}div.dts div.dataTables_scrollBody table{z-index:2}div.dts div.dataTables_paginate,div.dts div.dataTables_length{display:none}
+
+

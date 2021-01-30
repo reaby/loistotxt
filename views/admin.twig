@@ -1,5 +1,11 @@
 {% extends 'layout/layout.twig' %}
 
+{% block head %}
+<link rel='stylesheet' href='/stylesheets/datatables.min.css'/>
+<link rel='stylesheet' href='/stylesheets/datatables.semanticui.min.css'/>
+
+{% endblock %}
+
 {% block body %}
 <!-- top menu -->
 
@@ -119,7 +125,7 @@
 	<div class="left aligned ten wide column">
 		<div id="col3" class="ui inverted basic segment" style="overflow-y: auto">
 			<h1 class="ui left aligned inverted transparent input header"><input id="showTitle"
-					value="Untitled" /><button class="ui tiny inverted button"
+					value="" /><button class="ui tiny inverted button"
 					onclick="renameShow()">rename</button></button></h1>
 
 			<div id="tab" class="ui top attached inverted tabular menu">
@@ -196,9 +202,14 @@
 		<div class="header">
 			<span class="fileAction">Open</span>
 		</div>
-		<div class="scrolling content">
-			<div id="showContent" class="ui list">
-			</div>
+		<div class="content">
+			<table id="showContent" class="dataTable" style="width:100%">
+				<thead>
+					<tr>
+						<th>Filename</th>
+					</tr>
+				</thead>
+			</table>
 		</div>
 		<div class="actions">
 			<div class="ui input">
@@ -219,8 +230,16 @@
 		<div class="header">
 			Songs
 		</div>
-		<div class="scrolling content">
-			<div id="songContent" class="ui middle aligned divided list"></div>
+		<div class="content">
+			<table id="songContent" class="dataTable" style="width:100%">
+				<thead>
+					<tr>
+						<th>Title</th>
+						<th>Artist</th>
+						<th data-orderable="false">Actions</th>
+					</tr>
+				</thead>
+			</table>
 		</div>
 		<div class="actions">
 			<button class="ui blue button" onclick="createNewSong();">New Song</button>
@@ -232,6 +251,8 @@
 	</div>
 
 	<script src="/socket.io/socket.io.js"></script>
+	<script src="/javascripts/datatables.min.js"></script>
+	<script src="/javascripts/datatables.semanticui.min.js"></script>
 	<script src="/javascripts/sortable.umd.js"></script>
 	<script src="/javascripts/admin.js"></script>
 	{% endblock %}

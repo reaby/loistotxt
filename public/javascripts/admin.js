@@ -61,6 +61,7 @@ $(function () {
         action: function (text, value) {
             switch (value) {
                 case "new":
+                    socket.emit("newShow");
                     break;
                 case "open":
                     openShow();
@@ -145,7 +146,29 @@ function renameShow() {
 function openShow() {
     $('.fileAction').text("Open");
     $("#dialogFilename").val("");
-    $.getJSON("/ajax/shows", function (json) {
+    $('#showContent').DataTable().destroy();
+    $('#showContent').DataTable({
+        paging: false,
+        ajax: '/ajax/shows',
+        columns: [
+            { data: "file" }
+        ],
+        "initComplete": function () {
+            var api = this.api();
+            api.$('td').click(function () {
+                $("#dialogFilename").val(this.innerHTML);
+            });
+        }
+    });
+
+    $('#showDialog').modal({
+        blurring: true,
+        onApprove: function () {
+            socket.emit("loadShow", $("#dialogFilename").val());
+        }
+    }).modal('show');
+
+    /*$.getJSON("/ajax/shows", function (json) {
         let data = ``;
         for (let elem of json) {
             data += `
@@ -163,57 +186,94 @@ function openShow() {
                 socket.emit("loadShow", $("#dialogFilename").val());
             }
         }).modal('show');
+      
     });
-
+  */
 }
 
 function saveShow() {
     $('.fileAction').text("Save");
     $("#dialogFilename").val("");
-    $.getJSON("/ajax/shows", function (json) {
-        let data = ``;
-        for (let elem of json) {
-            data += `
-            <div class="item" onclick="selectShowFile(this);">
-                <i class="file icon"></i>
-                <div class="content noselect">
-                    <div class="header">${elem}</div>
-                </div>
-            </div>`;
+    $('#showContent').DataTable().destroy();
+    $('#showContent').DataTable({
+        paging: false,
+        scrollCollapse: true,
+        ajax: '/ajax/shows',
+        columns: [
+            { data: "file" }
+        ],
+        "initComplete": function () {
+            var api = this.api();
+            api.$('td').click(function () {
+                $("#dialogFilename").val(this.innerHTML);
+            });
         }
-        $("#showContent").html(data);
-        $('#showDialog').modal({
-            blurring: true,
-            onApprove: function () {
-                socket.emit("saveShow", $("#dialogFilename").val());
-            }
-        }).modal('show');
     });
+    $('#showDialog').modal({
+        blurring: true,
+        onApprove: function () {
+            socket.emit("saveShow", $("#dialogFilename").val());
+        }
+    }).modal('show');
 }
 
 function importSongs() {
-    $.getJSON("/ajax/songs", function (json) {
-        let data = ``;
-        for (let elem of json) {
-            data += `
-            <div class="item">
-                <div class="right floated middle aligned content noselect">
-                    <div class="ui button" onclick="editSong('${elem.file}')">Edit</div>
-                    <div class="ui green button" onclick="addSong('${elem.file}')">Import</div>
-             
-                </div>
-         
-                <div class="content noselect">
-                    <i class="music icon"></i>${elem.title} (${elem.artist})
-                </div>
-               
-            </div>`;
-        }
-        $("#songContent").html(data);
-        $('#songDialog').modal({
-            blurring: true
-        }).modal('show');
+    /* $.getJSON("/ajax/songs", function (json) {
+         let data = ``;
+         for (let elem of json) {
+             data += `
+             <div class="item">
+                 <div class="right floated middle aligned content noselect">
+                     <div class="ui button" onclick="editSong('${elem.file}')">Edit</div>
+                     <div class="ui green button" onclick="addSong('${elem.file}')">Import</div>
+                 </div>
+          
+                 <div class="content noselect">
+                     <i class="music icon"></i>${elem.title} (${elem.artist})
+                 </div>
+                
+             </div>`;
+         }
+         $("#songContent").html(data);*/
+
+    $('#songContent').DataTable().destroy();
+    $('#songContent').DataTable({
+        paging: false,
+        scrollCollapse: true,
+        pageLength: 25,
+        lengthChange: false,
+        info: false,
+        ajax: '/ajax/songs',
+        columns: [
+            { data: "title" },
+            { data: "artist" },
+            { data: "file" },
+        ],
+        "columnDefs": [
+            {
+                // The `data` parameter refers to the data for the cell (defined by the
+                // `data` option, which defaults to the column being worked with, in
+                // this case `data: 0`.
+                "render": function (data, type, row) {
+                    return `
+                        <div class="ui button" onclick="editSong('${data}')">Edit</div>
+                        <div class="ui green button" onclick="addSong('${data}')">Import</div>
+                        `;
+                },
+                "targets": 2
+            },
+        ]
+        /*"initComplete": function () {
+            var api = this.api();
+            api.$('td').click(function () {
+                $("#dialogFilename").val(this.innerHTML);
+            });
+        } */
     });
+
+    $('#songDialog').modal({
+        blurring: true
+    }).modal('show');
 }
 
 
