@@ -11,7 +11,7 @@ class websocket {
             },
             currentText: "",
             showTitle: false,
-            titles: {               
+            titles: {
                 title1: "",
                 sub1: "",
                 title2: "",
@@ -82,7 +82,7 @@ class websocket {
                 })
             });
     }
-    
+
     async getObsStatus(socket) {
         try {
             let data = await this.obs.send("GetSceneList");
@@ -123,7 +123,7 @@ class websocket {
             };
             data.songs.push(song);
         }
-        return data;     
+        return data;
     }
 
     getSongFile(filename) {
