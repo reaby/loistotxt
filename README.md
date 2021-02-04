@@ -1,5 +1,5 @@
 # LoistoTxt
-Song lyrics and lower 3rd titles displayer to obs, vmix or any casting software that supports browser source. Additionally you can remote control whitelisted scenes at OBS (required additional plugin to install)
+Song lyrics and lower 3rd titles displayer to obs, vmix or any casting software that supports browser source. Additionally you can remote control whitelisted scenes at OBS (additional plugin required for this).
 
 ## Install
     
@@ -39,8 +39,8 @@ structure of the file is quite obvious:
         }
     }
 
-Scenes here are the whitelist of scene names for changing the scenes at loistoTxt admin ui. These scenes become green and active buttons, which you can then double click to change, others are disabled to change, but you see the status.
-
+Scenes is a whitelist of scene names. You can use `"*"` to whitelist all scenes for changing.
+Active scene is displayed with green color on the ui.
 
 # Usage
 

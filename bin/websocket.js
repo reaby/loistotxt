@@ -79,7 +79,7 @@ class websocket {
                     io.emit("callback.dataUpdate", self.getIndexFile());
                 });
 
-          
+
                 client.on("moveSong", (oldIndex, newIndex) => {
                     let song = self.serverOptions.showData.songs.splice(oldIndex, 1);
                     self.serverOptions.showData.songs.splice(newIndex, 0, song[0]);
@@ -180,7 +180,7 @@ class websocket {
                     name: scene.name,
                     enabled: false
                 }
-                if (config.obs.scenes.indexOf(scene.name) != -1) {
+                if (config.obs.scenes.includes("*") || config.obs.scenes.indexOf(scene.name) != -1) {
                     obj.enabled = true;
                 }
                 outScenes.push(obj);

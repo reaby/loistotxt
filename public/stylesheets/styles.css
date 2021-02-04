@@ -78,7 +78,7 @@ iframe {
 }
 
 #allSongs .message {
-  margin: 0;
+  margin: 0.5rem;
 }
 
 .ui.inverted.segment .verse {

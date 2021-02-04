@@ -1,8 +1,8 @@
 {% extends 'layout/layout.twig' %}
 
 {% block head %}
-<link rel='stylesheet' href='/stylesheets/datatables.min.css'/>
-<link rel='stylesheet' href='/stylesheets/datatables.semanticui.min.css'/>
+<link rel='stylesheet' href='/stylesheets/datatables.min.css' />
+<link rel='stylesheet' href='/stylesheets/datatables.semanticui.min.css' />
 
 {% endblock %}
 
@@ -25,64 +25,6 @@
 			</div>
 		</div>
 	</div>
-
-	<!--	<a class="browse item">
-		Create titles
-		<i class="dropdown icon"></i>
-	</a>
-			
-	<div class="ui popup">
-		<div style="width: 60vw;" class="ui one column divided grid">
-			<div class="row">
-				<div class="column">
-					<div class="ui form list">
-						<div class="ui right action left icon fluid input">
-							<i class="user icon"></i>
-							<input id="title1" type="text" placeholder="">
-							{% if titleData.titles %}
-							<div id="loadTitle1" class="ui basic floating dropdown button">
-								<div class="text">Load</div>
-								<i class="dropdown icon"></i>
-								<div class="menu">
-									{% for item in titleData.titles %}
-									<div class="item">{{item}}</div>
-									{% endfor %}
-								</div>
-							</div>
-							{% endif %}
-							<button class="ui icon button" onclick="$('#title1').val('');">
-								<i class="delete icon"></i>
-							</button>
-						</div>
-						<div class="ui right action left icon fluid input">
-							<i class="info icon"></i>
-							<input id="sub1" type="text" placeholder="">
-							{% if titleData.subs %}
-							<div id="loadSub1" class="ui basic floating dropdown button">
-								<div class="text">Load</div>
-								<i class="dropdown icon"></i>
-								<div class="menu">
-									{% for item in titleData.subs %}
-									<div class="item">{{item}}</div>
-									{% endfor %}
-								</div>
-							</div>
-							{% endif %}
-							<button class="ui icon button" onclick="$('#sub1').val('');">
-								<i class="delete icon"></i>
-							</button>
-						</div>
-					</div>
-				</div>
-				<button id="toggleTitlesButton" class="ui inverted green button" onclick="toggleTitles();">Show
-					Title</button>
-
-			</div>
-	
-		</div>
-
-	</div>  -->
-
 	<div class="right menu">
 		<div class="item">
 			<div class="ui inverted buttons">
@@ -110,23 +52,11 @@
 
 <!-- Grids -->
 
-<!-- <div class="ui three column grid" id="content" > -->
 <div class="ui two column grid" id="content">
-
-
-	<!-- 	<div class="ui column">
-		<div id="col2" class="ui inverted basic segment" style="overflow-y: auto">
-			<h1 class="ui inverted header">Songs</h1>
-		
-			<div id="allSongs" class="ui slides list"></div>
-		</div>
-	</div>-->
-
 	<div class="left aligned ten wide column">
 		<div id="col3" class="ui inverted basic segment" style="overflow-y: auto">
-			<h1 class="ui left aligned inverted transparent input header"><input id="showTitle"
-					value="" /><button class="ui tiny inverted button"
-					onclick="renameShow()">rename</button></button></h1>
+			<h1 class="ui left aligned inverted transparent input header"><input id="showTitle" value="" /><button
+					class="ui tiny inverted button" onclick="renameShow()">rename</button></button></h1>
 
 			<div id="tab" class="ui top attached inverted tabular menu">
 				<a class="item active" data-tab="first">Songs</a>
@@ -145,7 +75,7 @@
 				<h1 class="ui header">Titles</h1>
 
 				<div class="ui action input">
-					<input id="newTitle" placeholder="FirstName SurName" />
+					<input id="newTitle" placeholder="Firstname Lastname" />
 					<button class="ui button" onclick="createTitle();">Create</button>
 				</div>
 				<div id="myTitles" class="ui list"></div>
@@ -159,100 +89,69 @@
 				</div>
 			</div>
 		</div>
-
-		<div class="row">
-
-
+		<div id="col1" class="row" style="overflow-y: auto">
+			<div id="sceneList" class="ui slides list"></div>
 		</div>
 	</div>
 </div>
 
-<!-- menu -->
-<div class="ui small primary bottom fixed pointing menu">
-
-	<div id="sceneList" class="item"></div>
-
-	<div class="right menu">
-		<div class="item">
-
-			<div class="ui inverted buttons">
-				<button class="ui icon button" onclick="prevText();">
-					<i class="step backward icon"></i>
-				</button>
-
-				<button class="ui  icon button" onclick="nextText();">
-					<i class="step forward icon"></i>
-				</button>
-			</div>
-
+<!-- file dialog -->
+<div id="showDialog" class="ui modal">
+	<i class="close icon"></i>
+	<div class="header">
+		<span class="fileAction">Open</span>
+	</div>
+	<div class="content">
+		<table id="showContent" class="dataTable" style="width:100%">
+			<thead>
+				<tr>
+					<th>Filename</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+	<div class="actions">
+		<div class="ui input">
+			<input id="dialogFilename" type="text" placeholder="Filename" />
 		</div>
-		<div class="item">
-			<div style="width: 1rem;"></div>
-
-			<button id="blackout" class="ui black basic button" onclick="clearText();">
-				Clear
-			</button>
-
+		<div class="ui positive button fileAction">
+			Open
+		</div>
+		<div class="ui black deny button">
+			Cancel
 		</div>
 	</div>
+</div>
 
-	<!-- file dialog -->
-	<div id="showDialog" class="ui modal">
-		<i class="close icon"></i>
-		<div class="header">
-			<span class="fileAction">Open</span>
-		</div>
-		<div class="content">
-			<table id="showContent" class="dataTable" style="width:100%">
-				<thead>
-					<tr>
-						<th>Filename</th>
-					</tr>
-				</thead>
-			</table>
-		</div>
-		<div class="actions">
-			<div class="ui input">
-				<input id="dialogFilename" type="text" placeholder="Filename" />
-			</div>
-			<div class="ui positive button fileAction">
-				Open
-			</div>
-			<div class="ui black deny button">
-				Cancel
-			</div>
+<!-- file dialog -->
+<div id="songDialog" class="ui modal">
+	<i class="close icon"></i>
+	<div class="header">
+		Songs
+	</div>
+	<div class="content">
+		<table id="songContent" class="dataTable" style="width:100%">
+			<thead>
+				<tr>
+					<th>Title</th>
+					<th>Artist</th>
+					<th data-orderable="false">Actions</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+	<div class="actions">
+		<button class="ui blue button" onclick="createNewSong();">New Song</button>
+		<button class="ui basic button" onclick="importSongs();">Refresh</button>
+		<div class="ui deny button">
+			Close
 		</div>
 	</div>
+</div>
 
-	<!-- file dialog -->
-	<div id="songDialog" class="ui modal">
-		<i class="close icon"></i>
-		<div class="header">
-			Songs
-		</div>
-		<div class="content">
-			<table id="songContent" class="dataTable" style="width:100%">
-				<thead>
-					<tr>
-						<th>Title</th>
-						<th>Artist</th>
-						<th data-orderable="false">Actions</th>
-					</tr>
-				</thead>
-			</table>
-		</div>
-		<div class="actions">
-			<button class="ui blue button" onclick="createNewSong();">New Song</button>
-			<button class="ui basic button" onclick="importSongs();">Refresh</button>
-			<div class="ui deny button">
-				Close
-			</div>
-		</div>
-	</div>
-
-	<script src="/socket.io/socket.io.js"></script>
-	<script src="/javascripts/datatables.min.js"></script>
-	<script src="/javascripts/datatables.semanticui.min.js"></script>
-	<script src="/javascripts/sortable.umd.js"></script>
-	<script src="/javascripts/admin.js"></script>
-	{% endblock %}
+<script src="/socket.io/socket.io.js"></script>
+<script src="/javascripts/datatables.min.js"></script>
+<script src="/javascripts/datatables.semanticui.min.js"></script>
+<script src="/javascripts/sortable.umd.js"></script>
+<script src="/javascripts/admin.js"></script>
+{% endblock %}

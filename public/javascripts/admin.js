@@ -84,10 +84,9 @@ $(function () {
     });
 
     $(window).on('viewportResize', function () {
-        //  $("#col1").css("height", ($(window).height() - (40 + $("#preview iframe").height() + $(".menu").height() * 2)) + "px")
-        $("#col1").css("height", ($(window).height() - (20 + $(".menu").height() * 2)) + "px")
-        $("#col2").css("height", ($(window).height() - (20 + $(".menu").height() * 2)) + "px")
-        $("#col3").css("height", ($(window).height() - (20 + $(".menu").height() * 2)) + "px")
+        $("#col1").css("height", ($(window).height() - (50 + $("#preview iframe").height() + $(".menu").height())) + "px")
+        $("#col2").css("height", ($(window).height() - (50 + $(".menu").height())) + "px")
+        $("#col3").css("height", ($(window).height() - (50 + $(".menu").height())) + "px")
     });
 
     $(window).trigger('viewportResize');
@@ -123,10 +122,12 @@ socket.on('obs.scenelist', data => {
             action = `ondblClick="setScene('${scene.name}', this)"`;
             color = "";
         }
-
         output += `
-        <button id="scene_${idx}" class="mini ui button ${color}" ${action} style="margin: 0 3px;">${scene.name}</button>
-    `;
+        <div class="ui left aligned gray message inverted item" id=scene_${idx}">
+            <div class="ui content noselect">                 
+                <button class="ui small basic inverted icon button" onclick="setScene('${scene.name}', this)"><i class="play icon"></i></button> ${scene.name}
+            </div>
+        </div>`;
         idx++;
     }
     $("#sceneList").html(output);
@@ -149,6 +150,8 @@ function openShow() {
     $('#showContent').DataTable().destroy();
     $('#showContent').DataTable({
         paging: false,
+        scrollCollapse: true,
+        info: false,
         ajax: '/ajax/shows',
         columns: [
             { data: "file" }
@@ -167,28 +170,6 @@ function openShow() {
             socket.emit("loadShow", $("#dialogFilename").val());
         }
     }).modal('show');
-
-    /*$.getJSON("/ajax/shows", function (json) {
-        let data = ``;
-        for (let elem of json) {
-            data += `
-            <div class="item" onclick="selectShowFile(this);">
-                <i class="file icon"></i>
-                <div class="content noselect">
-                    <div class="header">${elem}</div>
-                </div>
-            </div>`;
-        }
-        $("#showContent").html(data);
-        $('#showDialog').modal({
-            blurring: true,
-            onApprove: function () {
-                socket.emit("loadShow", $("#dialogFilename").val());
-            }
-        }).modal('show');
-      
-    });
-  */
 }
 
 function saveShow() {
@@ -198,6 +179,7 @@ function saveShow() {
     $('#showContent').DataTable({
         paging: false,
         scrollCollapse: true,
+        info: false,
         ajax: '/ajax/shows',
         columns: [
             { data: "file" }
@@ -283,12 +265,12 @@ function updateSongs() {
     let i = 0;
     for (var song of serverOptions.showData.songs) {
         output += `
-        <div class="ui left aligned gray message inverted item" data-song="${song.file}" onclick="loadSong('${song.file}', ${i})">
+        <div class="ui left aligned gray message inverted item handle" data-song="${song.file}" >
             <div class="right floated content noselect">
                 <button class="ui small basic inverted icon button" onclick="removeSong(${i})"><i class="delete icon"></i></button>
             </div>
-            <div class="ui content noselect">
-                 <div class="ui inverted basic icon button handle"><i class="move icon"></i></div>
+            <div class="ui content noselect" onclick="loadSong('${song.file}', ${i})">
+                 <div class="ui inverted basic icon button" onclick="loadSong('${song.file}', ${i})"><i class="play icon"></i></div>
                  <i class="music icon"></i> ${song.title} (${song.artist})
             </div>
         </div>`;
@@ -426,10 +408,11 @@ function renderUI() {
         $('#toggleTitlesButton').addClass("inverted");
     }
 
-    $("#sceneList button").each(function (idx, elem) {
-        $(elem).removeClass("blue loading").addClass("black inverted");
+    $("#sceneList .item").each(function (idx, elem) {
+        $(elem).find("button").removeClass("green loading");
+        $(elem).removeClass("green").addClass("gray");
         if (obsScenes[idx].name == serverOptions.obs.currentScene) {
-            $(elem).removeClass("black inverted").addClass("blue");
+            $(elem).removeClass("gray").addClass("green");
         }
         idx++;
     });
@@ -447,12 +430,12 @@ function renderUI() {
     i = 0;
     for (var title of serverOptions.showData.titles) {
         titles += `
-        <div class="ui left aligned gray message inverted item" data-idx="${title[0]}">
+        <div class="ui left aligned gray message inverted item handle" data-idx="${title[0]}" >
         <div class="right floated content noselect">
             <button class="ui small basic inverted icon button" onclick="removeTitle(${i})"><i class="delete icon"></i></button>
         </div>
         <div class="ui content noselect" onclick="showTitle(${i})">
-             <div class="ui inverted basic icon button handle"><i class="move icon"></i></div>
+             <div class="ui inverted basic icon button" onclick="showTitle(${i})"><i class="play icon"></i></div>
              ${title[0]}
         </div>
         </div>`;
