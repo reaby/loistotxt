@@ -4,8 +4,12 @@ const config = require('../config.json');
 
 class websocket {
 
-    constructor(io, obs) {
+    constructor(io, obs, qlc) {
         this.serverOptions = {
+            qlc: {
+                scenes: [],
+                statuses: {},
+            },
             obs: {
                 currentScene: "",
             },
@@ -27,11 +31,21 @@ class websocket {
                 sub2: ""
             }
         }
-
+        this.qlc = qlc || {};
         this.obs = obs || {};
         this.io = io;
         let self = this;
 
+        if (config.qlc.enabled) {
+            qlc.on("connect", (status) => {
+                if (status) {
+                this.getQlcStatus();
+                } else {
+                    this.serverOptions.qlc.scenes = [];
+                    this.serverOptions.qlc.statuses ={};
+                }
+            });
+        }
 
         obs.on('SwitchScenes', data => {
             self.serverOptions.obs.currentScene = data.sceneName;
@@ -42,10 +56,10 @@ class websocket {
             /** @var {SocketIO.client} client */
             client => {
                 client.emit("updateAll", self.serverOptions);
-
                 if (config.obs.enabled) {
                     self.getObsStatus(client);
                 }
+
 
                 client.on("showTitles", data => {
                     self.serverOptions.showTitle = true;
@@ -130,6 +144,12 @@ class websocket {
                     io.emit("update", self.serverOptions);
                 })
 
+                client.on("qlc.switchScene", async (index) => {
+                    await self.setQlcScene(index);
+                    await self.getQlcStatus();
+                    io.emit("update", self.serverOptions);
+                })
+
                 client.on("newShow", () => {
                     self.serverOptions.currentShow = "";
                     self.serverOptions.showData = {
@@ -168,6 +188,21 @@ class websocket {
                     client.emit("callback.loadSong", self.getSong(file));
                 });
             });
+    }
+
+    async setQlcScene(index) {        
+        for(let i in this.serverOptions.qlc.scenes) {
+            await this.qlc.send("setFunctionStatus", i, 0);                           
+        }
+        await this.qlc.send("setFunctionStatus", index, 1);               
+    }
+
+    async getQlcStatus() {
+        let scenes = await this.qlc.query("getFunctionsList");
+        this.serverOptions.qlc.scenes = scenes;
+        for (let i in scenes) {
+            this.serverOptions.qlc.statuses[i] = await this.qlc.query("getFunctionStatus", i);
+        }
     }
 
     async getObsStatus(socket) {

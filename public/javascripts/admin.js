@@ -461,6 +461,30 @@ function renderUI() {
         }
     });
 
+    let qlc = "";
+    i = 0;
+    for (var scene of serverOptions.qlc.scenes) {
+        qlc += `
+        <div class="ui left aligned gray message inverted item handle" data-idx="${scene}" >
+        <div class="ui content noselect" onclick="switchScene(${i})">
+             <div class="ui inverted basic icon button" onclick="switchScene(${i})"><i class="play icon"></i></div>
+             ${scene}
+        </div>
+        </div>`;
+        i++;
+    }
+    $('#lights').html(qlc);
+
+    $("#lights .item").each(function (idx, elem) {
+        $(elem).removeClass("active")
+       if (serverOptions.qlc.statuses[idx] == "Running") {
+            $(elem).addClass("active");
+        }
+    });
+}
+
+function switchScene(index) {
+    socket.emit("qlc.switchScene", index);
 }
 
 function createTitle() {

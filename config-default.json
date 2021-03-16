@@ -9,5 +9,11 @@
             "address": "127.0.0.1:4444",
             "password": "admin"
         }
+    },
+    "qlc": {
+        "enabled": false,
+        "websocket": {
+            "address": "127.0.0.1:9999"
+        }
     }
 }

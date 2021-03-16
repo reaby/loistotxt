@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 var ip = require('ip');
-const { app, obs } = require('../app');
+const { app, obs, qlc } = require('../app');
 const debug = require('debug')('loistotxt:server');
 const http = require('http');
 const websocket = require('./websocket.js');
@@ -23,7 +23,7 @@ app.set('port', port);
 const server = http.createServer(app);
 const io = require('socket.io')(server);
 
-const websocket_handler = new websocket(io, obs);
+const websocket_handler = new websocket(io, obs, qlc);
 
 /**
  * Listen on provided port, on all network interfaces.

@@ -8,16 +8,23 @@ const indexRouter = require('./routes/index');
 const fs = require('fs');
 const app = express();
 const config = require('./config.json');
+const QLCplus = require('./bin/qlcplus');
 const obsWebSocket = require('obs-websocket-js');
 const obs = new obsWebSocket();
+const qlc = new QLCplus();
 
 console.log("LoistoTxt starting...");
 
 CheckDir("./data");
 CheckDir("./data/songs");
 CheckDir("./data/shows");
+
 if (config.obs.enabled) {
   connectObs();
+}
+
+if (config.qlc.enabled) {
+  connectQlc();
 }
 
 // view engine setup
@@ -90,14 +97,23 @@ async function connectObs() {
       address: config.obs.websocket.address || "127.0.0.1:4444",
       password: config.obs.websocket.password || ""
     });
+
+    console.log(`OBS Connected.`)
+
   }
   catch (e) {
-    console.log(e);
+    console.log(`Error while connecting OBS websocket: ${e.error}!`);
+    console.log('To recover, restart app.');
   }
 }
 
 
-module.exports = { app, obs };
+async function connectQlc() {
+  console.log("Connecting to QLC+ ...");
+  await qlc.connect();
+}
+
+module.exports = { app, obs, qlc };
 
 
 
