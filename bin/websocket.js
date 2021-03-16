@@ -7,6 +7,7 @@ class websocket {
     constructor(io, obs, qlc) {
         this.serverOptions = {
             qlc: {
+                enabled: false,
                 scenes: [],
                 statuses: {},
             },
@@ -14,12 +15,13 @@ class websocket {
                 currentScene: "",
             },
             currentText: "",
-
             currentShow: "",
+            currentSong: "",
             showData: {
                 name: "",
                 titles: [],
-                songs: []
+                songs: [],
+                lights: {},
             },
 
             showTitle: false,
@@ -37,12 +39,13 @@ class websocket {
         let self = this;
 
         if (config.qlc.enabled) {
+            this.serverOptions.qlc.enabled = true;
             qlc.on("connect", (status) => {
                 if (status) {
-                this.getQlcStatus();
+                    this.getQlcStatus();
                 } else {
                     this.serverOptions.qlc.scenes = [];
-                    this.serverOptions.qlc.statuses ={};
+                    this.serverOptions.qlc.statuses = {};
                 }
             });
         }
@@ -123,7 +126,10 @@ class websocket {
 
                 client.on("removeSong", (i) => {
                     try {
+                        let file = self.serverOptions.showData.songs[i].file;
+                        delete self.serverOptions.showData.lights[file];
                         self.serverOptions.showData.songs.splice(i, 1);
+                        
                         io.emit("updateAll", self.serverOptions);
                     } catch (e) {
                         console.log(e);
@@ -144,10 +150,29 @@ class websocket {
                     io.emit("update", self.serverOptions);
                 })
 
+                client.on("qlc.saveSongScene", (value) => {
+                    let song = self.serverOptions.currentSong;
+                    self.serverOptions.showData.lights[song] = value;                    
+                });
+
+                client.on("qlc.cueScene", async (value) => {
+                    let index = self.serverOptions.qlc.scenes.indexOf(value);                    
+                    if (index !== -1) {
+                        await self.setQlcScene(index);
+                        setTimeout(async () => {
+                            await self.getQlcStatus();
+                            io.emit("obs.update", self.serverOptions);
+                        }, 200)
+                    }
+                });
+
+
                 client.on("qlc.switchScene", async (index) => {
                     await self.setQlcScene(index);
-                    await self.getQlcStatus();
-                    io.emit("update", self.serverOptions);
+                    setTimeout(async () => {
+                        await self.getQlcStatus();
+                        io.emit("obs.update", self.serverOptions);
+                    }, 200)
                 })
 
                 client.on("newShow", () => {
@@ -155,7 +180,8 @@ class websocket {
                     self.serverOptions.showData = {
                         name: "",
                         titles: [],
-                        songs: []
+                        songs: [],
+                        lights: {}
                     }
                     client.emit("updateAll", self.serverOptions);
                 });
@@ -185,16 +211,17 @@ class websocket {
 
 
                 client.on("loadSong", file => {
+                    self.serverOptions.currentSong = file;
                     client.emit("callback.loadSong", self.getSong(file));
                 });
             });
     }
 
-    async setQlcScene(index) {        
-        for(let i in this.serverOptions.qlc.scenes) {
-            await this.qlc.send("setFunctionStatus", i, 0);                           
+    async setQlcScene(index) {
+        for (let i in this.serverOptions.qlc.scenes) {
+            await this.qlc.send("setFunctionStatus", i, 0);
         }
-        await this.qlc.send("setFunctionStatus", index, 1);               
+        await this.qlc.send("setFunctionStatus", index, 1);
     }
 
     async getQlcStatus() {

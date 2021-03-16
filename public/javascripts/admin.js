@@ -200,24 +200,6 @@ function saveShow() {
 }
 
 function importSongs() {
-    /* $.getJSON("/ajax/songs", function (json) {
-         let data = ``;
-         for (let elem of json) {
-             data += `
-             <div class="item">
-                 <div class="right floated middle aligned content noselect">
-                     <div class="ui button" onclick="editSong('${elem.file}')">Edit</div>
-                     <div class="ui green button" onclick="addSong('${elem.file}')">Import</div>
-                 </div>
-          
-                 <div class="content noselect">
-                     <i class="music icon"></i>${elem.title} (${elem.artist})
-                 </div>
-                
-             </div>`;
-         }
-         $("#songContent").html(data);*/
-
     $('#songContent').DataTable().destroy();
     $('#songContent').DataTable({
         paging: false,
@@ -245,12 +227,6 @@ function importSongs() {
                 "targets": 2
             },
         ]
-        /*"initComplete": function () {
-            var api = this.api();
-            api.$('td').click(function () {
-                $("#dialogFilename").val(this.innerHTML);
-            });
-        } */
     });
 
     $('#songDialog').modal({
@@ -298,7 +274,35 @@ function setScene(name, elem) {
 
 function updateSong(input) {
     songData = input.data;
-    let output = `<h3 style="margin-bottom: 0;">${songData.artist}</h3><h1 style="margin-top:0;">${songData.title}</h1>`;
+    let output = "";
+    output +=
+        `
+        <h3 style="margin-bottom: 0;">${songData.artist}</h3>
+        <h1 style="margin-top:0;">${songData.title}</h1>        
+    `;
+    if (serverOptions.qlc.enabled) {
+        output += `     
+        <hr class="ui separator" />
+        <span>Quick Lights: </span>
+
+        <div class="ui buttons">
+            <div id="selectScene" class="ui gray dropdown icon button">
+                <div class="text">Click to select</div>
+                    <div class="menu">                                       
+                    </div>               
+                </div>             
+            <div id="selectLightAction" class="ui floating gray dropdown icon button">
+                <i class="dropdown icon"></i>
+                <div class="menu">            
+                    <div class="item" data-value="clear"><i class="remove icon"></i>Clear</div>                    
+                </div>
+            </div>
+        </div>   
+        <div class="ui green button" onclick="cueScene();">Cue</div>
+                      
+        <hr class="ui separator" />
+        `;
+    }
     texts = [];
     currentIdx = -1;
     let idx = 0;
@@ -317,6 +321,48 @@ function updateSong(input) {
     }
 
     $('#song').html(output);
+    if (serverOptions.qlc.enabled) {
+        let qlcValues = [];
+
+        for (let scene of serverOptions.qlc.scenes) {
+            qlcValues.push({ name: scene, value: scene });
+        }
+
+        $('#selectScene').dropdown({
+            direction: "downward",
+            values: qlcValues,
+            action: function (text, value) {
+                $('#selectScene').dropdown("set selected", value);
+                let val = $('#selectScene').dropdown("get value");
+                socket.emit("qlc.saveSongScene", val);
+                $('#selectScene').dropdown("hide");
+            },
+
+        });
+        
+        if (serverOptions.showData.lights[input.file]) {
+            $('#selectScene').dropdown("set selected", serverOptions.showData.lights[input.file]);
+        }
+
+        $('#selectLightAction').dropdown({
+            direction: "downward",
+            action: function (text, value) {
+                switch (value) {                    
+                    case "clear": 
+                        socket.emit("qlc.saveSongScene", null);                        
+                        $('#selectScene').dropdown("clear");
+                        break;
+                }
+                $('#selectLightAction').dropdown("hide");
+            }
+        });
+    }
+
+}
+
+function cueScene() {
+    let val = $('#selectScene').dropdown("get value");
+    socket.emit("qlc.cueScene", val);
 }
 
 function loadSong(songid, index) {
@@ -477,7 +523,7 @@ function renderUI() {
 
     $("#lights .item").each(function (idx, elem) {
         $(elem).removeClass("active")
-       if (serverOptions.qlc.statuses[idx] == "Running") {
+        if (serverOptions.qlc.statuses[idx] == "Running") {
             $(elem).addClass("active");
         }
     });
