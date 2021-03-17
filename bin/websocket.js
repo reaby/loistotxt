@@ -156,7 +156,12 @@ class websocket {
                 });
 
                 client.on("qlc.cueScene", async (value) => {
-                    let index = self.serverOptions.qlc.scenes.indexOf(value);                    
+                    let index = -1;
+                    for( let scene of self.serverOptions.qlc.scenes) {
+                        if (scene.name == value) {
+                            index = scene.id;
+                        }
+                    }
                     if (index !== -1) {
                         await self.setQlcScene(index);
                         setTimeout(async () => {
@@ -167,8 +172,8 @@ class websocket {
                 });
 
 
-                client.on("qlc.switchScene", async (index) => {
-                    await self.setQlcScene(index);
+                client.on("qlc.switchScene", async (index) => {                    
+                    self.setQlcScene(index);
                     setTimeout(async () => {
                         await self.getQlcStatus();
                         io.emit("obs.update", self.serverOptions);
@@ -217,11 +222,11 @@ class websocket {
             });
     }
 
-    async setQlcScene(index) {
-        for (let i in this.serverOptions.qlc.scenes) {
-            await this.qlc.send("setFunctionStatus", i, 0);
+    setQlcScene(index) {
+        for (let scene of this.serverOptions.qlc.scenes) {
+            this.qlc.send("setFunctionStatus", scene.id, 0);
         }
-        await this.qlc.send("setFunctionStatus", index, 1);
+        this.qlc.send("setFunctionStatus", index, 1);
     }
 
     async getQlcStatus() {

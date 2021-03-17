@@ -324,8 +324,8 @@ function updateSong(input) {
     if (serverOptions.qlc.enabled) {
         let qlcValues = [];
 
-        for (let scene of serverOptions.qlc.scenes) {
-            qlcValues.push({ name: scene, value: scene });
+        for (let scene of serverOptions.qlc.scenes) {          
+            qlcValues.push({ name: scene.name, value: scene.name });
         }
 
         $('#selectScene').dropdown({
@@ -337,7 +337,6 @@ function updateSong(input) {
                 socket.emit("qlc.saveSongScene", val);
                 $('#selectScene').dropdown("hide");
             },
-
         });
         
         if (serverOptions.showData.lights[input.file]) {
@@ -511,10 +510,10 @@ function renderUI() {
     i = 0;
     for (var scene of serverOptions.qlc.scenes) {
         qlc += `
-        <div class="ui left aligned gray message inverted item handle" data-idx="${scene}" >
-        <div class="ui content noselect" onclick="switchScene(${i})">
-             <div class="ui inverted basic icon button" onclick="switchScene(${i})"><i class="play icon"></i></div>
-             ${scene}
+        <div class="ui left aligned gray message inverted item handle" data-idx="${scene.name}" >
+        <div class="ui content noselect" onclick="switchScene(${scene.id})">
+             <div class="ui inverted basic icon button"><i class="play icon"></i></div>
+             ${scene.name}
         </div>
         </div>`;
         i++;
