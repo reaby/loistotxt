@@ -62,7 +62,11 @@ class websocket {
                 if (config.obs.enabled) {
                     self.getObsStatus(client);
                 }
-
+                
+                if (self.serverOptions.currentSong != "") {
+                    client.emit("callback.loadSong", self.getSong(self.serverOptions.currentSong));                    
+                }
+            
 
                 client.on("showTitles", data => {
                     self.serverOptions.showTitle = true;
@@ -165,6 +169,7 @@ class websocket {
                     if (index !== -1) {
                         await self.setQlcScene(index);
                         setTimeout(async () => {
+                            
                             await self.getQlcStatus();
                             io.emit("obs.update", self.serverOptions);
                         }, 200)
@@ -178,7 +183,20 @@ class websocket {
                         await self.getQlcStatus();
                         io.emit("obs.update", self.serverOptions);
                     }, 200)
-                })
+                });
+
+                client.on("qlc.syncScenes", async (index) => {                    
+                        await self.getQlcStatus();
+                        io.emit("obs.update", self.serverOptions);
+                });
+
+                client.on("qlc.clearScenes", async (index) => {                    
+                    self.clearQlcScene(index);
+                    setTimeout(async () => {
+                        await self.getQlcStatus();
+                        io.emit("obs.update", self.serverOptions);
+                    }, 200)
+                });
 
                 client.on("newShow", () => {
                     self.serverOptions.currentShow = "";
@@ -222,11 +240,20 @@ class websocket {
             });
     }
 
+    clearQlcScene(index) {
+        for (let scene of this.serverOptions.qlc.scenes) {
+            this.qlc.send("setFunctionStatus", scene.id, 0);
+        }
+    }
+
     setQlcScene(index) {
         for (let scene of this.serverOptions.qlc.scenes) {
             this.qlc.send("setFunctionStatus", scene.id, 0);
         }
-        this.qlc.send("setFunctionStatus", index, 1);
+        setTimeout( () => {
+            this.qlc.send("setFunctionStatus", index, 1);
+        }, 100);
+    
     }
 
     async getQlcStatus() {

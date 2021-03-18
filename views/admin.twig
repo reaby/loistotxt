@@ -81,6 +81,8 @@
 				<div id="myTitles" class="ui list"></div>
 			</div>
 			<div class="ui bottom attached inverted tab segment" data-tab="fourth">				
+				<button class="ui small button" onclick="socket.emit('qlc.syncScenes');"><i class="refresh icon"></i>Sync Scenes</class></button>
+				<button class="ui small button" onclick="socket.emit('qlc.clearScenes');"><i class="trash icon"></i>Reset Scenes</class></button>
 				<div id="lights" class="ui list"></div>
 			</div>
 		</div>

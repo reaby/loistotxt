@@ -124,8 +124,8 @@ socket.on('obs.scenelist', data => {
         }
         output += `
         <div class="ui left aligned gray message inverted item" id=scene_${idx}">
-            <div class="ui content noselect">                 
-                <button class="ui small basic inverted icon button" onclick="setScene('${scene.name}', this)"><i class="play icon"></i></button> ${scene.name}
+            <div class="ui content noselect">           
+                <button class="ui small basic inverted icon button" ondblclick="setScene('${scene.name}', this)"><i class="play icon"></i></button> ${scene.name}
             </div>
         </div>`;
         idx++;
@@ -241,11 +241,12 @@ function updateSongs() {
     let i = 0;
     for (var song of serverOptions.showData.songs) {
         output += `
-        <div class="ui left aligned gray message inverted item handle" data-song="${song.file}" >
+        <div class="ui left aligned gray message inverted item" data-song="${song.file}" >
             <div class="right floated content noselect">
                 <button class="ui small basic inverted icon button" onclick="removeSong(${i})"><i class="delete icon"></i></button>
             </div>
-            <div class="ui content noselect" onclick="loadSong('${song.file}', ${i})">
+            <div class="ui content noselect">
+                <div class="ui inverted basic icon button handle"><i class="move icon"></i></div>
                  <div class="ui inverted basic icon button" onclick="loadSong('${song.file}', ${i})"><i class="play icon"></i></div>
                  <i class="music icon"></i> ${song.title} (${song.artist})
             </div>
@@ -274,6 +275,7 @@ function setScene(name, elem) {
 
 function updateSong(input) {
     songData = input.data;
+    currentSong = input.file;
     let output = "";
     output +=
         `
