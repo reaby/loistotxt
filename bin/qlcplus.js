@@ -18,7 +18,6 @@ class QLCplus extends EventEmitter {
         }
         try {
             this.websocket.send("QLC+API|" + command + "|" + params.join("|"));
-            console.log("QLC+API|" + command + "|" + params.join("|"));
             return await eventToPromise(this, `api:${command}`);
         } catch (e) {
             console.log(e);
@@ -32,8 +31,7 @@ class QLCplus extends EventEmitter {
             return;
         }
         try {
-            this.websocket.send("QLC+API|" + command + "|" + params.join("|"));   
-            console.log("QLC+API|" + command + "|" + params.join("|"));         
+            this.websocket.send("QLC+API|" + command + "|" + params.join("|"));         
         } catch (e) {
             console.log(e);
         }
