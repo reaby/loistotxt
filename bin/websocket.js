@@ -3,15 +3,17 @@ const fs = require("fs");
 const config = require('../config.json');
 
 class websocket {
-
     constructor(io, obs, qlc) {
         this.serverOptions = {
             qlc: {
-                enabled: false,
+                enabled: config.qlc.enabled,
                 scenes: [],
                 statuses: {},
+                connected: false,
             },
             obs: {
+                enabled: config.obs.enabled,
+                connected: false,
                 currentScene: "",
             },
             currentText: "",
@@ -38,17 +40,39 @@ class websocket {
         this.io = io;
         let self = this;
 
-        if (config.qlc.enabled) {
-            this.serverOptions.qlc.enabled = true;
+        if (config.qlc.enabled) {            
             qlc.on("connect", (status) => {
                 if (status) {
+                    self.serverOptions.qlc.connected = status;
                     this.getQlcStatus();
                 } else {
                     this.serverOptions.qlc.scenes = [];
                     this.serverOptions.qlc.statuses = {};
-                }
+                }               
             });
+
+            qlc.on("disconnect", () => {
+                self.serverOptions.qlc.connected = false;
+                io.emit("obs.update", self.serverOptions);                
+            });
+
         }
+
+        obs.on('ConnectionClosed', (data) => {            
+            self.serverOptions.obs.connected = false;       
+            io.emit("obs.scenelist", { currentScene: "", scenes: [] });     
+            io.emit("obs.update", self.serverOptions);
+        });
+
+        obs.on('AuthenticationSuccess', (data) => {            
+            self.serverOptions.obs.connected = true;
+            io.emit("obs.update", self.serverOptions);
+            self.getObsStatus(io);
+        });
+
+        obs.on('Error', (data) => {            
+            console.log(data);
+        });
 
         obs.on('SwitchScenes', data => {
             self.serverOptions.obs.currentScene = data.sceneName;
@@ -67,6 +91,29 @@ class websocket {
                     io.emit("callback.loadSong", self.getSong(self.serverOptions.currentSong));
                 }
 
+                client.on("obs.connect", async () => {
+                    try {
+
+                        console.log("Connecting to local obs websocket!");
+                        await obs.connect({
+                            address: config.obs.websocket.address || "127.0.0.1:4444",
+                            password: config.obs.websocket.password || ""
+                        });
+                        console.log(`OBS Connected.`)
+                        self.serverOptions.obs.connected = true;
+                    } catch (e) {
+                        self.serverOptions.obs.connected = false;
+                        console.log(`Error while connecting OBS websocket: ${e.error}!`);
+                        console.log('To recover, restart app or select at webview connect -> OBS');
+                    }
+
+                })
+
+                client.on("qlc.connect", async () => {
+                    console.log("Connecting to QLC+ ...");
+                    await qlc.connect();
+                    io.emit("obs.update", self.serverOptions);                    
+                })
 
                 client.on("showTitles", data => {
                     self.serverOptions.showTitle = true;

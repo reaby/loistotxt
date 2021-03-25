@@ -99,18 +99,18 @@ async function connectObs() {
     });
 
     console.log(`OBS Connected.`)
-
-  }
-  catch (e) {
+    return true;
+  } catch (e) {
     console.log(`Error while connecting OBS websocket: ${e.error}!`);
-    console.log('To recover, restart app.');
+    console.log('To recover, restart app or select at webview connect -> OBS');
+    return false;
   }
 }
 
 
 async function connectQlc() {
   console.log("Connecting to QLC+ ...");
-  await qlc.connect();
+  return await qlc.connect();
 }
 
 module.exports = { app, obs, qlc };

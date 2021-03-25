@@ -74,6 +74,21 @@ $(function () {
         }
     });
 
+    $('#utils').dropdown({
+        direction: "downward",
+        action: function (text, value) {
+            switch (value) {
+                case "obs":
+                    socket.emit("obs.connect");
+                    break;
+                case "qlc":
+                    socket.emit("qlc.connect");
+                    break;
+            }
+            $('#file').dropdown("hide");
+        }
+    });
+
     $(window).resize(function () {
         if (this.resizeTO)
             clearTimeout(this.resizeTO);
@@ -326,7 +341,7 @@ function updateSong(input) {
     if (serverOptions.qlc.enabled) {
         let qlcValues = [];
 
-        for (let scene of serverOptions.qlc.scenes) {          
+        for (let scene of serverOptions.qlc.scenes) {
             qlcValues.push({ name: scene.name, value: scene.name });
         }
 
@@ -340,7 +355,7 @@ function updateSong(input) {
                 $('#selectScene').dropdown("hide");
             },
         });
-        
+
         if (serverOptions.showData.lights[input.file]) {
             $('#selectScene').dropdown("set selected", serverOptions.showData.lights[input.file]);
         }
@@ -348,9 +363,9 @@ function updateSong(input) {
         $('#selectLightAction').dropdown({
             direction: "downward",
             action: function (text, value) {
-                switch (value) {                    
-                    case "clear": 
-                        socket.emit("qlc.saveSongScene", null);                        
+                switch (value) {
+                    case "clear":
+                        socket.emit("qlc.saveSongScene", null);
                         $('#selectScene').dropdown("clear");
                         break;
                 }
@@ -453,6 +468,29 @@ function renderUI() {
         $('#toggleTitlesButton').removeClass("inverted");
     } else {
         $('#toggleTitlesButton').addClass("inverted");
+    }
+
+    let errCount = 0;
+    if (serverOptions.obs.enabled) {
+        if (serverOptions.obs.connected) {
+            $("#obsStatus").html(`<i class="ui icon check circle"></i>`);
+        } else {
+            errCount += 1;
+            $("#obsStatus").html(`<i class="ui icon circle outline"></i>`);
+        }
+    }
+    if (serverOptions.qlc.enabled) {
+        if (serverOptions.qlc.connected) {
+            $("#qlcStatus").html(`<i class="ui icon check circle"></i>`);
+        } else {
+            errCount += 1;
+            $("#qlcStatus").html(`<i class="ui icon circle outline"></i>`);
+        }
+    }
+    if (errCount > 0) {
+        $("#connectStatuses").html(`<span class="ui red circular label">${errCount}</span>`);
+    } else {
+        $("#connectStatuses").html(``);
     }
 
     $("#sceneList .item").each(function (idx, elem) {

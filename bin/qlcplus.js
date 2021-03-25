@@ -22,9 +22,8 @@ class QLCplus extends EventEmitter {
         } catch (e) {
             console.log(e);
         }
-
     }
-
+    
     send(command, ...params) {
         if (this.isConnected === false) {
             console.log("tried to send command to QLC+, but api is disconnected!");
@@ -54,11 +53,14 @@ class QLCplus extends EventEmitter {
         this.websocket.on("close", (code) => {
             this.isConnected = false;
             this.websocket = null;
-            this.emit("connect", false);            
+            this.emit("connect", false); 
+            this.emit("disconnect");            
         });
 
         this.websocket.on("error", (err) => {
             console.log("QLC+ connection error!");            
+            this.isConnected = false;
+            this.emit("disconnect");
         });
 
         this.websocket.on("message", (msg) => {

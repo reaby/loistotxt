@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var fs = require('fs');
+var config = require('../config.json');
 
 router.get('/', function (req, res, next) {
   let titles = fs.readFileSync("./public/images/titles.svg").toString();
@@ -13,8 +14,7 @@ router.get('/admin', function (req, res, next) {
     data = JSON.parse(fs.readFileSync("./data/status.json").toString());
   }
   const files = fs.readdirSync("./data/shows") ?? {};
-
-  res.render('admin', { status: data, showFiles: files });
+  res.render('admin', { status: data, showFiles: files, config: config });
 });
 
 router.get('/admin/editsong', function (req, res, next) {
