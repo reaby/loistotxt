@@ -58,13 +58,13 @@ class websocket {
         io.on('connection',
             /** @var {SocketIO.client} client */
             client => {
-                client.emit("updateAll", self.serverOptions);
+                io.emit("updateAll", self.serverOptions);
                 if (config.obs.enabled) {
                     self.getObsStatus(client);
                 }
 
                 if (self.serverOptions.currentSong != "") {
-                    client.emit("callback.loadSong", self.getSong(self.serverOptions.currentSong));
+                    io.emit("callback.loadSong", self.getSong(self.serverOptions.currentSong));
                 }
 
 
@@ -205,7 +205,7 @@ class websocket {
                         songs: [],
                         lights: {}
                     }
-                    client.emit("updateAll", self.serverOptions);
+                    io.emit("updateAll", self.serverOptions);
                 });
 
                 client.on("loadShow", (file) => {
@@ -213,7 +213,7 @@ class websocket {
                         if (fs.existsSync("./data/shows/" + file)) {
                             self.serverOptions.showData = JSON.parse(fs.readFileSync("./data/shows/" + file).toString());
                             self.serverOptions.currentShow = file;
-                            client.emit("updateAll", self.serverOptions);
+                            io.emit("updateAll", self.serverOptions);
                         }
                     } catch (error) {
                         console.log(error);
@@ -225,16 +225,15 @@ class websocket {
                         file = file.replace(".json", "") + ".json";
                         let fileData = JSON.stringify(self.serverOptions.showData);
                         fs.writeFileSync("./data/shows/" + file, fileData);
-                        client.emit("updateAll", self.serverOptions);
+                        io.emit("updateAll", self.serverOptions);
                     } catch (error) {
                         console.log(error);
                     }
                 });
 
-
                 client.on("loadSong", file => {
                     self.serverOptions.currentSong = file;
-                    client.emit("callback.loadSong", self.getSong(file));
+                    io.emit("callback.loadSong", self.getSong(file));
                 });
             });
     }
