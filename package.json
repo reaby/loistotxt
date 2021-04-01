@@ -19,6 +19,7 @@
     "node-sass-middleware": "0.11.0",
     "obs-websocket-js": "4.0.2",
     "socket.io": "4.0.0",
-    "twig": "1.15.4"
+    "twig": "1.15.4",
+    "y18n": ">=4.0.1"
   }
 }
