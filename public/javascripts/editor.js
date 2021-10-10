@@ -16,15 +16,14 @@ $(() => {
                                 </div>
                     
                                 <div class="verseContent" style="margin-top: 1rem;">
-                `;
-            for (let line of elem.texts) {
+                `;            
                 output += `<div class="ui fluid action input" style="margin-top: 0.5rem;">
                             <div style="margin-left: 3rem;" class="ui icon button handle"><i class="ui icon move"></i></div>
-                            <textarea rows="1" cols="120" class="textarea" oninput="onEdit(this)" onchange="snap">${line}</textarea>
+                            <textarea cols="120" class="textarea" oninput="onEdit(this)" onchange="snap">${elem.text}</textarea>
                             <button style="margin-left: 0.25rem;" class="ui red icon button" onclick="removeElem(this);"><i class="ui trash icon"></i></button>
                             <button style="margin-left: 0.25rem;" class="ui red icon button" onclick="duplicateElem(this);"><i class="clone outline icon"></i></button>
                     </div>`;
-            }
+            
             output += `</div>`;
             output += `<button style="margin-top: 1rem;" class="ui center aligned green icon button" onclick="addText(this);"><i class="ui icon add"></i> Add Text</button>`;
             output += `</div></div>`;
@@ -125,9 +124,9 @@ function addText(elem) {
 
 function onEdit(ref) {
     let lines = ref.value.split("\n");
-    if (lines.length >= 2) {
-        ref.value = lines[0] + "\n" + lines[1];
-    }
+    /* if (lines.length >= 2) {
+         ref.value = lines[0] + "\n" + lines[1];
+     } */
 }
 
 

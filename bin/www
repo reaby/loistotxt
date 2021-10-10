@@ -94,6 +94,6 @@ function onListening() {
     : 'port ' + addr.port;
 
   console.log('\nAdmin interface now available:\nhttp://' + ip.address() + ":" + addr.port + "/admin\n");
-  console.log('OBS add new "browser source" and use this address:\nhttp://' + ip.address() + ":" + addr.port + "\n");
-
+  console.log('OBS add new "browser source" and use this address:\nhttp://' + ip.address() + ":" + addr.port + "/video\n");
+  console.log('Projectors use this address:\nhttp://' + ip.address() + ":" + addr.port + "\n");
 }

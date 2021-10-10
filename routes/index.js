@@ -1,11 +1,17 @@
-var express = require('express');
-var router = express.Router();
-var fs = require('fs');
-var config = require('../config.json');
+const express = require('express');
+const router = express.Router();
+const fs = require('fs');
+const config = require('../config.json');
+let songCache = [];
+let bgCache = [];
+
+router.get('/video', function (req, res, next) {
+  let titles = fs.readFileSync("./public/images/titles.svg").toString();
+  res.render('displayVideo', { titles: titles });
+});
 
 router.get('/', function (req, res, next) {
-  let titles = fs.readFileSync("./public/images/titles.svg").toString();
-  res.render('display', { titles: titles });
+  res.render('displayProjector');
 });
 
 router.get('/admin', function (req, res, next) {
@@ -21,14 +27,26 @@ router.get('/admin/editsong', function (req, res, next) {
   res.render('editsong', { title: '', song: req.query.uuid || "" });
 });
 
+router.get('/ajax/backgrounds', function (req, res, next) {
+  let bg = fs.readdirSync("./data/backgrounds");
+  if (bgCache.length != bg.length) {
+    console.log("Background cache!");
+    bgCache = bg;
+  }
+  res.json({ data: bg });
+});
+
 router.get('/ajax/songs', function (req, res, next) {
   let songs = fs.readdirSync("./data/songs");
-  let outData = [];
-  for (song of songs) {
-    let info = JSON.parse(fs.readFileSync("./data/songs/" + song).toString());
-    outData.push({ title: info.title, artist: info.artist, file: song, actions: "" });
+  if (songCache.length != songs.length) {
+    console.log("Generating song cache!");
+    songCache = [];
+    for (song of songs) {
+      let info = JSON.parse(fs.readFileSync("./data/songs/" + song).toString());
+      songCache.push({ title: info.title, artist: info.artist, file: song, actions: "" });
+    }
   }
-  res.json({ data: outData });
+  res.json({ data: songCache });
 });
 
 router.get('/ajax/shows', function (req, res, next) {

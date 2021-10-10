@@ -105,9 +105,30 @@ $(function () {
     });
 
     $(window).trigger('viewportResize');
+
+    $.getJSON("/ajax/backgrounds", (payload, err) => {        
+        let output = "";
+        let idx = 0;
+        for(filename of payload.data) {
+            output += `
+            <div class="ui left aligned gray message inverted item" id="bg_${idx}" data-bg="${filename}">
+                <div class="ui content noselect">           
+                    <button class="ui small basic inverted icon button" onclick="setBackground('${filename}', this)"><i class="play icon"></i></button>${filename}
+                </div>
+            </div>`;
+            idx+=1;
+        }
+
+        $("#backgrounds").html(output);
+    });
 });
 
 socket.on("update", data => {
+    serverOptions = data;
+    renderUI();
+});
+
+socket.on("callback.setBackground", data => {
     serverOptions = data;
     renderUI();
 });
@@ -138,7 +159,7 @@ socket.on('obs.scenelist', data => {
             color = "";
         }
         output += `
-        <div class="ui left aligned gray message inverted item" id=scene_${idx}">
+        <div class="ui left aligned gray message inverted item" id="scene_${idx}">
             <div class="ui content noselect">           
                 <button class="ui small basic inverted icon button" ondblclick="setScene('${scene.name}', this)"><i class="play icon"></i></button> ${scene.name}
             </div>
@@ -157,6 +178,14 @@ socket.on('obs.update', data => {
 
 function renameShow() {
     socket.emit("renameShow", $("#showTitle").val());
+}
+
+function setBackground(file) {
+    socket.emit("setBackground", file);
+}
+
+function blackout() {
+    socket.emit("toggleBlackout");
 }
 
 function openShow() {
@@ -217,9 +246,9 @@ function saveShow() {
 function importSongs() {
     $('#songContent').DataTable().destroy();
     $('#songContent').DataTable({
-        paging: false,
+        paging: true,
         scrollCollapse: true,
-        pageLength: 25,
+        pageLength: 20,
         lengthChange: false,
         info: false,
         ajax: '/ajax/songs',
@@ -323,19 +352,43 @@ function updateSong(input) {
     texts = [];
     currentIdx = -1;
     let idx = 0;
+    let songPart = 0;
     for (var data of songData.songData) {
         output += `<h3>${data.title}</h3>`;
-        for (var line of data.texts) {
-            texts.push(line.replace("\n", "<br>"));
-            output += `
-            <div id="text_${idx}" class="ui inverted gray message item" onclick="sendText(${idx})">            
-                <div class="content noselect">
-                        ${line.replace("\n", '<br>')}
-                </div>
-            </div>`;
-            idx++;
+        songSection = 0;
+        let temp = "";
+        for (var line of data.text.split("\n")) {
+            temp += line + "<br>";
+            if (songSection >= 1) {
+                output += `
+                    <div id="text_${idx}" class="ui inverted gray message item" onclick="sendText(${idx}, ${songPart})">            
+                        <div class="content noselect">
+                                ${temp}
+                        </div>
+                    </div>
+                `;
+                texts.push(temp);
+                temp = "";
+                idx++;
+                songSection = -1;
+            }
+            songSection += 1;
         }
+        if (temp != "") {
+            output += `
+            <div id="text_${idx}" class="ui inverted gray message item" onclick="sendText(${idx}, ${songPart})">            
+                <div class="content noselect">
+                        ${temp}
+                </div>
+            </div>
+           
+        `;
+            idx++;
+            texts.push(temp);
+        }
+        songPart += 1;
     }
+
 
     $('#song').html(output);
     if (serverOptions.qlc.enabled) {
@@ -402,7 +455,7 @@ function removeTitle(id) {
     }
 }
 
-function sendText(idx) {
+function sendText(idx, songSection) {
     $("#song .item").each(function () {
         $(this).removeClass("active");
     });
@@ -410,11 +463,11 @@ function sendText(idx) {
     $("#text_" + idx).addClass("active");
     if (idx < 0) {
         currentIdx = -1;
-        socket.emit("setText", "");
+        socket.emit("setText", {text:"", slideText:""});
     }
     if (idx >= texts.length) {
         currentIdx = texts.length;
-        socket.emit("setText", "");
+        socket.emit("setText", {text:"", slideText:""});
     }
     if (currentIdx == idx) {
         clearText();
@@ -423,7 +476,7 @@ function sendText(idx) {
     }
     if (texts[idx]) {
         currentIdx = idx;
-        socket.emit("setText", texts[idx]);
+        socket.emit("setText", { text: texts[idx], slideText: songData.songData[songSection].text} );
     }
 }
 
@@ -436,22 +489,11 @@ function prevText() {
 }
 
 function clearText() {
-    socket.emit("setText", "");
+    socket.emit("setText", {text: "", slideText: ""});
     $("#song .item").each(function () {
         $(this).removeClass("active");
     });
 }
-
-
-function sendLine(text) {
-    if (text) {
-        socket.emit("setText", text);
-        $("#song .item").each(function () {
-            $(this).removeClass("active");
-        });
-    }
-}
-
 
 function editSong(filename) {
     window.open("/admin/editsong?uuid=" + filename, '_blank', 'location=no,height=720,width=600,status=no');
@@ -566,6 +608,28 @@ function renderUI() {
             $(elem).addClass("active");
         }
     });
+
+    $("#backgrounds .item").each(function (idx, elem) {
+        $(elem).removeClass("active")
+        if (elem.dataset.bg == serverOptions.background) {
+            $(elem).addClass("active");
+        }
+    });    
+}
+
+function changeSource(url) {
+    let id = $('#preview').embed("get id");
+    $('#preview').embed('change', null, id, url);
+    $("#button-projector").removeClass("green");
+    $("#button-stream").removeClass("green");
+    switch (url) {
+        case "/":
+            $("#button-projector").addClass("green"); 
+            break;
+        case "/video":
+            $("#button-stream").addClass("green"); 
+            break;
+    }
 }
 
 function switchScene(index) {

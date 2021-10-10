@@ -21,10 +21,11 @@
 			text-shadow: -1px -1px 2px #000, 1px -1px 2px #000, -1px 1px 2px #000, 1px 1px 2px #000;
 		}
 
-		.helper {
+		.helper {			
 			position: absolute;
 			bottom: 10%;
 			text-align: center;
+			height: auto !important;
 			width: 100%;
 		}
 
@@ -69,13 +70,20 @@
 		var serverOptions = {};
 		var oldTitleStatus = false;
 		var index = 0;
+	
+		socket.on("syncClient", data => {
+			oldTitleStatus = serverOptions.showTitle;
+			serverOptions = data;
+			index++;
+			renderView();
+		});
 
 		socket.on("update", data => {
-		oldTitleStatus = serverOptions.showTitle;
-		serverOptions = data;
-		$("#text" + (index % 2)).fadeOut();
-		index++;
-		renderView();
+			oldTitleStatus = serverOptions.showTitle;
+			serverOptions = data;
+			$("#text" + (index % 2)).fadeOut();
+			index++;
+			renderView();
 		});
 
 function renderView() {

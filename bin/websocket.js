@@ -19,13 +19,15 @@ class websocket {
             currentText: "",
             currentShow: "",
             currentSong: "",
+            currentSlideText: "",
             showData: {
                 name: "",
                 titles: [],
                 songs: [],
                 lights: {},
             },
-
+            blackout: false,
+            background: "",
             showTitle: false,
             titles: {
                 index: -1,
@@ -34,7 +36,8 @@ class websocket {
                 title2: "",
                 sub2: ""
             }
-        }
+        };
+
         this.qlc = qlc || {};
         this.obs = obs || {};
         this.io = io;
@@ -83,6 +86,8 @@ class websocket {
             /** @var {SocketIO.client} client */
             client => {
                 io.emit("updateAll", self.serverOptions);
+                io.emit("syncClient", self.serverOptions);
+
                 if (config.obs.enabled) {
                     self.getObsStatus(client);
                 }
@@ -117,21 +122,33 @@ class websocket {
 
                 client.on("showTitles", data => {
                     self.serverOptions.showTitle = true;
-                    self.serverOptions.currentText = "";
+                    // self.serverOptions.currentText = "";
                     self.serverOptions.titles = data;
                     io.emit("update", self.serverOptions);
                 });
 
+                client.on("setBackground", data => {
+                    self.serverOptions.background = data;
+                    io.emit("callback.setBackground", self.serverOptions);
+                });
+
+                client.on("toggleBlackout", data => {
+                    self.serverOptions.blackout = !self.serverOptions.blackout;
+                    io.emit("update", self.serverOptions);
+                });
+
+
                 client.on("hideTitles", data => {
                     self.serverOptions.showTitle = false;
-                    self.serverOptions.currentText = "";
+                  //  self.serverOptions.currentText = "";
                     self.serverOptions.titles = {};
                     io.emit("update", self.serverOptions);
                 });
 
                 client.on("setText", data => {
                     self.serverOptions.showTitle = false;
-                    self.serverOptions.currentText = data.replace("\n", "<br/>");
+                    self.serverOptions.currentText = data.text.replace("\n", "<br/>");                    
+                    self.serverOptions.currentSlideText = data.slideText.replace("\n", "<br/>");                    
                     io.emit("update", self.serverOptions);
                 })
 
@@ -279,7 +296,7 @@ class websocket {
                 });
 
                 client.on("loadSong", file => {
-                    self.serverOptions.currentSong = file;
+                    self.serverOptions.currentSong = file;     
                     io.emit("callback.loadSong", self.getSong(file));
                 });
             });

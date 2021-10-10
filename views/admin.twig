@@ -51,11 +51,13 @@
 			</div>
 			<div style="width: 1rem;"></div>
 
-			<div class="ui buttons">
-				<button id="blackout" class="ui black basic button" onclick="clearText();">
-					Clear
-				</button>
-			</div>
+			<button id="blackout" class="ui black basic button" onclick="blackout();">
+					Blackout
+			</button>
+
+			<button id="clear" class="ui black basic button" onclick="clearText();">
+				Clear
+			</button>			
 		</div>
 	</div>
 </div>
@@ -74,6 +76,7 @@
 			<div id="tab" class="ui top attached inverted tabular menu">
 				<a class="item active" data-tab="first">Songs</a>
 				<a class="item" data-tab="second">Lyrics</a>
+				<a class="item" data-tab="backgrounds">Backgrounds</a>
 				<a class="item" data-tab="third">Titles</a>
 				{% if config.qlc.enabled %}
 				<a class="item" data-tab="fourth">Lights</a>
@@ -86,6 +89,10 @@
 			<div class="ui bottom attached inverted tab segment" data-tab="second">
 				<!-- LYRICS -->
 				<div id="song" class="ui list"></div>
+			</div>
+			<div class="ui bottom attached inverted tab segment" data-tab="backgrounds">
+				<!-- BACKGROUNDS -->
+				<div id="backgrounds" class="ui list"></div>
 			</div>
 			<div class="ui bottom attached inverted tab segment" data-tab="third">
 				<h1 class="ui header">Titles</h1>
@@ -107,8 +114,10 @@
 	</div>
 	<div class="ui six wide column">
 		<div class="row">
-			<div class="ui inverted basic segment" style="overflow-y: none">
-				<div id="preview" data-url="/" class="ui 16:9 embed" style="background: gray; border: 1px solid black;">
+			<div class="ui inverted basic segment" style="overflow-y: none">			
+				<div id="preview" data-url="/" class="ui 16:9 embed" style="background: gray; border: 1px solid black;"></div>
+				<div style="text-align: center;">
+					<button id="button-projector" class="ui small green button" onclick="changeSource('/');">Projector</button><button id="button-stream" class="ui small button" onclick="changeSource('/video');" >Stream overlay</button>
 				</div>
 			</div>
 		</div>
@@ -119,7 +128,7 @@
 </div>
 
 <!-- file dialog -->
-<div id="showDialog" class="ui modal">
+<div id="showDialog" class="ui fullscreen modal">
 	<i class="close icon"></i>
 	<div class="header">
 		<span class="fileAction">Open</span>

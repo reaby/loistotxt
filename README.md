@@ -1,4 +1,7 @@
-# LoistoTxt
+# LoistoTxt 2.0
+
+Notice: Songs data format has been changed since version 1.3.1, app will crash if you attempt to load old files...
+
 Song lyrics and lower 3rd titles displayer to obs, vmix or any casting software that supports browser source. Additionally you can remote control whitelisted scenes at OBS (additional plugin required for this).
 Optionally you can control lights on [QLC+ lightdesk app](https://www.qlcplus.org/).
 
@@ -59,13 +62,22 @@ After app starts, it says something like this:
     http://localhost:3000/admin
 
     OBS add new "browser source" and use this address:
-    http://localhost:3000
+    http://localhost:3000/video
+	
+	Projectors use this address:
+	http://localhost:3000/
 
 
 Admin interface is without any passwords for now, since well, I don't need such at our production, and you should run this at a private network anyway...
 
 And for OBS, like the console window says, add a new `browser source`, and paste the address there. You might need to click refresh source, if you restart the service, but it should auto connect anyway after you get initial connetion.
 See wiki article `getting started` for tutorial.
+
+## Video projectors
+
+A new feature is ability to use video projectors in addition to stream view.
+Background can be set to the projectors view with backgrounds-tab. 
+Placing .jpg, .png, or .mp4 files at `data/backgrounds` folder to load, notice if you run this outside of intranet the file sizes must be optimized. Videos will loop.
 
 ## QLC+ integration
 
