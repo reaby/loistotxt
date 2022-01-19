@@ -8,22 +8,22 @@ $(() => {
         $("#artist").val(data.artist);
         if (!Array.isArray(data.songData)) return;
         for (let elem of data.songData) {
-            output += `<div class="ui gray inverted segment verse">                                                            
-                                <div class="ui fluid labelled action input">                                               
+            output += `<div class="ui gray inverted segment verse">
+                                <div class="ui fluid labelled action input">
                                     <label class="ui label handle"><i class="ui icon move"></i> Title</label>
                                     <input class="ui input" type="text" value="${elem.title}" />
                                     <button class="ui red icon button" onclick="removeElem($(this).parent());"><i class="ui trash icon"></i>Delete part</button>
                                 </div>
-                    
+
                                 <div class="verseContent" style="margin-top: 1rem;">
-                `;            
+                `;
                 output += `<div class="ui fluid action input" style="margin-top: 0.5rem;">
                             <div style="margin-left: 3rem;" class="ui icon button handle"><i class="ui icon move"></i></div>
                             <textarea cols="120" class="textarea" oninput="onEdit(this)" onchange="snap">${elem.text}</textarea>
                             <button style="margin-left: 0.25rem;" class="ui red icon button" onclick="removeElem(this);"><i class="ui trash icon"></i></button>
                             <button style="margin-left: 0.25rem;" class="ui red icon button" onclick="duplicateElem(this);"><i class="clone outline icon"></i></button>
                     </div>`;
-            
+
             output += `</div>`;
             output += `<button style="margin-top: 1rem;" class="ui center aligned green icon button" onclick="addText(this);"><i class="ui icon add"></i> Add Text</button>`;
             output += `</div></div>`;
@@ -73,16 +73,16 @@ function removeElem(elem) {
 
 function addVerse() {
     setUndoPoint();
-    output = `<div class="ui gray inverted segment verse">                   
-                    <div class="ui fluid labelled action input">                  
+    output = `<div class="ui gray inverted segment verse">
+                    <div class="ui fluid labelled action input">
                         <label class="ui label handle"><i class="ui icon move"></i> Title</label>
                         <input class="ui input" type="text" value="" autofocus="1" />
                         <button class="ui red icon button" onclick="removeElem($(this).parent());"><i class="ui trash icon"></i>Delete part</button>
                     </div>
-                
+
                     <div class="verseContent" style="margin-top: 1rem;">
                     </div>
-                    <button style="margin-top: 1rem;" class="ui center aligned green icon button" onclick="addText(this);"><i class="ui icon add"></i>Add Text</button>                 
+                    <button style="margin-top: 1rem;" class="ui center aligned green icon button" onclick="addText(this);"><i class="ui icon add"></i>Add Text</button>
                     </div>
                 `;
     $("#songeditor").append(output);
@@ -131,19 +131,15 @@ function onEdit(ref) {
 
 
 async function save() {
-
     let outData = [];
     $("#songeditor .verse").each(function () {
         let title = $(this).find("input").val().toString();
-        let texts = [];
+        let text = "";
         $(this).find("textarea").each(function () {
-            let text = $(this).val();
-            if (text) {
-                texts.push(text);
-            }
+            text += $(this).val();
         });
-        if (title && texts) {
-            outData.push({ "title": title, "texts": texts });
+        if (title != "" && text != "") {
+            outData.push({ "title": title, "text": text });
         }
     });
 
